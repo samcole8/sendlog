@@ -1,3 +1,9 @@
+# Application configuration files
+sendlog.yml
+
+# Examples directory
+!examples/*
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
