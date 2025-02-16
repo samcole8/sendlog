@@ -1,8 +1,12 @@
-alerts:
-  # List of file
-  - path: /var/auth.log # Path to monitored file
-    type: MyFileType # The type of file
-    trigger: MyTrigger # The name of the trigger plugin
-    transformer: MyTransformer # The name of the transformer plugin
-    endpoint: MyEndpoint # The name of the endpoint plugin
-    enabled: true # Enable or disable the alert
+files:
+  - path: /var/auth.log
+    type: my_type
+    triggers:
+      - name: MyTrigger
+        transformations:
+          - name: MyTransformation
+            endpoints:
+              - endpoint1
+              - endpoint2
+              - endpoint3
+    enabled: true
