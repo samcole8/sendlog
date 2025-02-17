@@ -33,7 +33,7 @@ files:
     type: MyType
     triggers:
       - name: MyTrigger
-        transformations:
+        format:
           - name: MyFormat
             endpoints:
               - endpoint1
