@@ -1,12 +1,16 @@
 files:
   - path: /var/auth.log
-    type: my_type
+    type: MyType
     triggers:
       - name: MyTrigger
-        transformations:
-          - name: MyTransformation
+        formats:
+          - name: MyFormat
             endpoints:
               - endpoint1
               - endpoint2
               - endpoint3
     enabled: true
+
+plugins:
+  - my_plugin_1
+  - my_plugin_2
