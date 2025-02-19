@@ -29,19 +29,14 @@ Endpoints represent the destination for the alert (SMS, email, e.t.c) and handle
 
 ```yaml
 files:
-  - path: /var/auth.log
-    type: MyType
-    triggers:
-      - name: MyTrigger
-        format:
-          - name: MyFormat
+  /var/auth.log:
+    plugin: myplugin
+    rules:
+      MyRule:
+        transformations:
+          MyTransformation:
             endpoints:
-              - endpoint1
-              - endpoint2
-              - endpoint3
+              - myendpoint
+              - myendpoint2
     enabled: true
-
-plugins:
-  - my_plugin_1
-  - my_plugin_2
 ```
