@@ -14,16 +14,6 @@ class WorkflowManager:
         self._workflows = {}
         self._cache = {}
 
-    def _set_node(self, parent_node, node_data, node_level):
-        node = None
-        for child in parent_node.children:
-            if child.data == node_data:
-                node = child
-        if node is None:
-            node = _WorkflowNode(node_data, node_level)
-            parent_node.add_child(node)
-        return node
-
     def load_workflow(self, path, plugin_name, log_name, rule_name, transformation_name, endpoint_name):
         """Load a workflow based on the given parameters."""
 
