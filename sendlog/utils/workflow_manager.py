@@ -21,27 +21,26 @@ class WorkflowManager:
         if path not in self._workflows.keys():
             current_plugin = import_plugin(PLUGIN_RPATH + "." + plugin_name)
             current_log = resolve_class(current_plugin, log_name)
-            log_node = current_log("format")
+            log_node = current_log()
             self._workflows[path] = log_node
         else:
             log_node = self._workflows[path]
 
         # Set or load Rule objects
-        full_rule_name = repr(log_node) + rule_name
-        
-        if full_rule_name not in log_node.children:
+        full_rule_name = repr(log_node) + "." + rule_name
+
+        if full_rule_name not in log_node:
             current_rule = resolve_class(log_node, rule_name)
-            rule_node = current_rule("rule")
+            rule_node = current_rule()
             log_node.add_child(rule_node)
         else:
             rule_node = next((child for child in log_node.children if repr(child) == full_rule_name), None)
-            print(rule_node)
         # Set or load Transformation objects
-        full_transformation_name = repr(rule_node) + transformation_name
+        full_transformation_name = repr(rule_node) + "." + transformation_name
         
-        if full_transformation_name not in rule_node.children:
+        if full_transformation_name not in rule_node:
             current_transformation = resolve_class(rule_node, transformation_name)
-            transformation_node = current_transformation("transformation")
+            transformation_node = current_transformation()
             rule_node.add_child(transformation_node)
         else:
             transformation_node = next((child for child in rule_node.children if repr(child) == full_transformation_name), None)
@@ -49,10 +48,10 @@ class WorkflowManager:
         
         # Set or load Endpoints
         full_endpoint_name = f"endpoints.{endpoint_name}"
-        if full_endpoint_name not in transformation_node.children:
+        if full_endpoint_name not in transformation_node:
             current_endpoint = resolve_class(endpoints, endpoint_name)
-            endpoint_node = current_endpoint("endpoint")
-            transformation_node.add_child(endpoint_name)
+            endpoint_node = current_endpoint()
+            transformation_node.add_child(endpoint_node)
         else:
             endpoint_node = next((child for child in transformation_node.children if repr(child) == endpoint_name), None)
 

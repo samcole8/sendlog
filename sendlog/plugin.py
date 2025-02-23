@@ -1,8 +1,7 @@
 class _WorkflowNode:
     
     """Base class for workflow components"""
-    def __init__(self, level):
-        self.level = level
+    def __init__(self):
         self.children = []
 
     def add_child(self, child_node):
