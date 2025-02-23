@@ -1,11 +1,10 @@
 files:
   /var/auth.log:
-    plugin: myplugin
+    plugin: my_plugin
+    format: MyLog
     rules:
       MyRule:
         transformations:
           MyTransformation:
             endpoints:
-              - myendpoint
-              - myendpoint2
-    enabled: true
+              - Console

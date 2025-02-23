@@ -21,7 +21,7 @@ class ConfigHandler:
         
         def files():
             for path, file_config in self._config["files"].items():
-                yield path, file_config["plugin"], file_config
+                yield path, file_config["plugin"], file_config["format"], file_config
         
         def rules(file_config):
             for rule_name, rule_config in file_config["rules"].items():
@@ -35,8 +35,8 @@ class ConfigHandler:
             for endpoint_name in transformation_config["endpoints"]:
                 yield endpoint_name
 
-        for path, module_name, file_config in files():
+        for path, module_name, log_name, file_config in files():
             for rule_name, rule_config in rules(file_config):
                 for transformation_name, transformation_config in transformations(rule_config):
                     for endpoint_name in endpoints(transformation_config):
-                        yield path, module_name, rule_name, transformation_name, endpoint_name
+                        yield path, module_name, log_name, rule_name, transformation_name, endpoint_name
