@@ -20,7 +20,7 @@ class WorkflowManager:
             if child.data == node_data:
                 node = child
         if node is None:
-            node = WorkflowNode(node_data, node_level)
+            node = _WorkflowNode(node_data, node_level)
             parent_node.add_child(node)
         return node
 
@@ -54,7 +54,7 @@ class WorkflowManager:
             transformation_node = current_transformation("transformation")
             rule_node.add_child(transformation_node)
         else:
-            transformation_node = next(child for child in rule_node.children if repr(child) == full_transformation_name)
+            transformation_node = next((child for child in rule_node.children if repr(child) == full_transformation_name), None)
             
         
         # Set or load Endpoints
