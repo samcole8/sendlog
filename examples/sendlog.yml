@@ -11,6 +11,7 @@ files:
 
 destinations:
   my_destination:
+    plugin: my_plugin
     endpoint: MyEndpoint
     vars:
       my_username: ${ENDPOINT_USERNAME}
