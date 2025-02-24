@@ -1,7 +1,7 @@
 from importlib import import_module
-import endpoints
 
-PLUGIN_RPATH = "plugins"
+FILE_PLUGIN_RPATH = "plugins.files"
+ENDPOINT_PLUGIN_RPATH = "plugins.endpoints"
 
 def resolve_class(parent, class_name):
     return getattr(parent, class_name)
@@ -13,13 +13,14 @@ class WorkflowManager:
     def __init__(self):
         self._workflows = {}
         self._cache = {}
+        self._endpoints = {}
 
-    def load_workflow(self, path, plugin_name, log_name, rule_name, transformation_name, endpoint_name):
+    def load_workflow(self, path, plugin_name, log_name, rule_name, transformation_name, dest_name):
         """Load a workflow based on the given parameters."""
 
         # Set or load Log object
         if path not in self._workflows.keys():
-            current_plugin = import_plugin(PLUGIN_RPATH + "." + plugin_name)
+            current_plugin = import_plugin(FILE_PLUGIN_RPATH + "." + plugin_name)
             current_log = resolve_class(current_plugin, log_name)
             log_node = current_log()
             self._workflows[path] = log_node
@@ -45,15 +46,15 @@ class WorkflowManager:
         else:
             transformation_node = next((child for child in rule_node.children if repr(child) == full_transformation_name), None)
             
-        
         # Set or load Endpoints
-        full_endpoint_name = f"endpoints.{endpoint_name}"
-        if full_endpoint_name not in transformation_node:
-            current_endpoint = resolve_class(endpoints, endpoint_name)
-            endpoint_node = current_endpoint()
-            transformation_node.add_child(endpoint_node)
-        else:
-            endpoint_node = next((child for child in transformation_node.children if repr(child) == endpoint_name), None)
+        endpoint_class = self._endpoints[dest_name]["class"]
+        transformation_node.add_child(endpoint_class(dest_name, **self._endpoints[dest_name]["vars"]))
+
+    def load_destinations(self, plugin_name, endpoint_name, dest_name, dest_vars):
+        dest_plugin = import_plugin(f"{ENDPOINT_PLUGIN_RPATH}.{plugin_name}")
+        dest_class = resolve_class(dest_plugin, endpoint_name)
+        self._endpoints[dest_name] = {"class": dest_class,
+                                      "vars": dest_vars}
 
     def get_paths(self):
         return list(self._workflows.keys())

@@ -52,7 +52,15 @@ class Transformation(_WorkflowNode, metaclass=_TransformationMeta):
     def transform(self, line):
         raise NotImplementedError
 
-class Endpoint(_WorkflowNode, metaclass=_EndpointMeta):
+class Endpoint(metaclass=_EndpointMeta):
+    def __init__(self, dest_name, **kwargs):
+        self.dest_name = dest_name
+        for key, value in kwargs.items():
+            setattr(self, key, value)
+
+    def __repr__(self):
+        return f"{self.__class__.__name__} ({self.dest_name})"
+
     def send(self, msg):
         raise NotImplementedError
 
