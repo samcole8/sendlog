@@ -6,5 +6,12 @@ files:
       MyRule:
         transformations:
           MyTransformation:
-            endpoints:
-              - Console
+            destinations:
+              - my_destination
+
+destinations:
+  my_destination:
+    endpoint: MyEndpoint
+    vars:
+      my_username: ${ENDPOINT_USERNAME}
+      my_password: ${ENDPOINT_PASSWORD}
