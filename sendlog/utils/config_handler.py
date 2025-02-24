@@ -12,11 +12,11 @@ class ConfigHandler:
         with open(self._path, "r") as file:
             self._config = yaml.safe_load(file)
 
-    def get_data(self):
+    def files(self):
         """
         Traverse the configuration file and yield information about every alert in the following format:
 
-        (path, module_name, rule_name, transformation_name, endpoint_name)
+        (path, module_name, log_name, rule_name, transformation_name, dest_name)
         """
         
         def files():
@@ -31,12 +31,19 @@ class ConfigHandler:
             for transformation_name, transformation_config in rule_config["transformations"].items():
                 yield transformation_name, transformation_config
         
-        def endpoints(transformation_config):
-            for endpoint_name in transformation_config["endpoints"]:
-                yield endpoint_name
+        def destinations(transformation_config):
+            for destination_name in transformation_config["destinations"]:
+                yield destination_name
 
         for path, module_name, log_name, file_config in files():
             for rule_name, rule_config in rules(file_config):
                 for transformation_name, transformation_config in transformations(rule_config):
-                    for endpoint_name in endpoints(transformation_config):
-                        yield path, module_name, log_name, rule_name, transformation_name, endpoint_name
+                    for destination_name in destinations(transformation_config):
+                        yield path, module_name, log_name, rule_name, transformation_name, destination_name
+
+    def destinations(self):
+        for dest_name, dest_config in self._config["destinations"].items():
+            plugin_name = dest_config["plugin"]
+            endpoint_name = dest_config["endpoint"]
+            dest_vars = dest_config.get("vars", None)
+            yield plugin_name, endpoint_name, dest_name, dest_vars
