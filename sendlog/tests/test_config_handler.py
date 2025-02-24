@@ -6,7 +6,7 @@ class TestConfigHandler(unittest.TestCase):
 
     @patch('builtins.open', create=True)
     @patch('yaml.safe_load')
-    def test_get_data(self, mock_safe_load, mock_open):
+    def test_files(self, mock_safe_load, mock_open):
         mock_safe_load.return_value = {
             "files": {
                 "/var/auth.log": {
@@ -16,10 +16,10 @@ class TestConfigHandler(unittest.TestCase):
                         "MyRule": {
                             "transformations": {
                                 "MyTransformation": {
-                                    "endpoints": ["myendpoint"]
+                                    "destinations": ["myendpoint"]
                                 },
                                 "MyOtherTransformation": {
-                                    "endpoints": ["myendpoint3"]
+                                    "destinations": ["myendpoint3"]
                                 }
                             }
                         }
@@ -32,7 +32,7 @@ class TestConfigHandler(unittest.TestCase):
                         "AppRule": {
                             "transformations": {
                                 "AppTransformation": {
-                                    "endpoints": ["appendpoint1", "appendpoint2"]
+                                    "destinations": ["appendpoint1", "appendpoint2"]
                                 }
                             }
                         }
@@ -45,7 +45,7 @@ class TestConfigHandler(unittest.TestCase):
                         "TransactionRule": {
                             "transformations": {
                                 "TransactionTransformation": {
-                                    "endpoints": ["transendpoint1", "transendpoint2"]
+                                    "destinations": ["transendpoint1", "transendpoint2"]
                                 }
                             }
                         }
@@ -55,7 +55,7 @@ class TestConfigHandler(unittest.TestCase):
         }
         mock_open.return_value.__enter__.return_value = MagicMock()
         config_handler = ConfigHandler("test_config.yml")
-        data = list(config_handler.get_data())
+        data = list(config_handler.files())
         expected_data = [
             ('/var/auth.log', 'myplugin', 'MyLog' ,'MyRule', 'MyTransformation', 'myendpoint'),
             ('/var/auth.log', 'myplugin', 'MyLog' ,'MyRule', 'MyOtherTransformation', 'myendpoint3'),
