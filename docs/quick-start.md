@@ -1,13 +1,3 @@
-# sendlog
-
-[![Release](https://img.shields.io/github/v/release/samcole8/sendlog)](https://github.com/samcole8/sendlog/releases/latest)
-![Last Commit](https://img.shields.io/github/last-commit/samcole8/sendlog)
-![Repo Size](https://img.shields.io/github/repo-size/samcole8/sendlog)
-
-sendlog is a lightweight, extensible log monitoring framework with rule-based alerting. View the full documentation at [sendlog.samcole.net](https://sendlog.samcole.net/).
-
-*NOTE: Sendlog is in alpha. In its current state, it may be unstable and is subject to significant changes in future releases.*
-
 ## Quick Start Guide
 
 ### Installation
@@ -62,3 +52,7 @@ If the configuration file changes, restart the service:
 ```sh
 sudo systemctl restart sendlog
 ```
+
+<hr>
+
+Next: [Plugins](plugins.md)
