@@ -1,5 +1,5 @@
-import yaml
 from importlib import import_module
+import yaml
 
 class ConfigHandler:
     """Initialises and stores objects referenced in the configuration file."""
@@ -16,30 +16,30 @@ class ConfigHandler:
         """
         Traverse the configuration file and yield information about every alert in the following format:
 
-        (path, module_name, log_name, rule_name, transformation_name, dest_name)
+        (path, module_name, log_name, rule_name, transformer_name, dest_name)
         """
         
         def files():
             for path, file_config in self._config["files"].items():
-                yield path, file_config["plugin"], file_config["format"], file_config
+                yield path, file_config["plugin"], file_config["log_type"], file_config
         
         def rules(file_config):
             for rule_name, rule_config in file_config["rules"].items():
                 yield rule_name, rule_config
         
-        def transformations(rule_config):
-            for transformation_name, transformation_config in rule_config["transformations"].items():
-                yield transformation_name, transformation_config
+        def transformers(rule_config):
+            for transformer_name, transformer_config in rule_config["transformers"].items():
+                yield transformer_name, transformer_config
         
-        def destinations(transformation_config):
-            for destination_name in transformation_config["destinations"]:
+        def destinations(transformer_config):
+            for destination_name in transformer_config["destinations"]:
                 yield destination_name
 
-        for path, module_name, log_name, file_config in files():
+        for path, plugin_name, log_name, file_config in files():
             for rule_name, rule_config in rules(file_config):
-                for transformation_name, transformation_config in transformations(rule_config):
-                    for destination_name in destinations(transformation_config):
-                        yield path, module_name, log_name, rule_name, transformation_name, destination_name
+                for transformer_name, transformer_config in transformers(rule_config):
+                    for destination_name in destinations(transformer_config):
+                        yield path, plugin_name, log_name, rule_name, transformer_name, destination_name
 
     def destinations(self):
         for dest_name, dest_config in self._config["destinations"].items():

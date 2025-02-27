@@ -1,11 +1,11 @@
 files:
   /var/auth.log:
     plugin: my_plugin
-    format: MyLog
+    log_type: MyLogType
     rules:
       MyRule:
-        transformations:
-          MyTransformation:
+        transformers:
+          MyTransformer:
             destinations:
               - my_destination
 
@@ -14,5 +14,5 @@ destinations:
     plugin: my_plugin
     endpoint: MyEndpoint
     vars:
-      my_username: ${ENDPOINT_USERNAME}
-      my_password: ${ENDPOINT_PASSWORD}
+      my_username: username
+      my_password: password

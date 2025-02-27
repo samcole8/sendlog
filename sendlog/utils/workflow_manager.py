@@ -1,6 +1,6 @@
 from importlib import import_module
 
-FILE_PLUGIN_RPATH = "plugins.files"
+FILE_PLUGIN_RPATH = "plugins.workflows"
 ENDPOINT_PLUGIN_RPATH = "plugins.endpoints"
 
 def resolve_class(parent, class_name):
@@ -12,49 +12,47 @@ def import_plugin(plugin):
 class WorkflowManager:
     def __init__(self):
         self._workflows = {}
-        self._cache = {}
-        self._endpoints = {}
+        self._destinations = {}
 
-    def load_workflow(self, path, plugin_name, log_name, rule_name, transformation_name, dest_name):
+    def load_workflow(self, file_path, plugin_name, logtype_name, rule_name, transformer_name, destination_name):
         """Load a workflow based on the given parameters."""
 
         # Set or load Log object
-        if path not in self._workflows.keys():
+        if file_path not in self._workflows.keys():
             current_plugin = import_plugin(FILE_PLUGIN_RPATH + "." + plugin_name)
-            current_log = resolve_class(current_plugin, log_name)
-            log_node = current_log()
-            self._workflows[path] = log_node
+            current_log = resolve_class(current_plugin, logtype_name)
+            logtype_node = current_log()
+            self._workflows[file_path] = logtype_node
         else:
-            log_node = self._workflows[path]
+            logtype_node = self._workflows[file_path]
 
         # Set or load Rule objects
-        full_rule_name = repr(log_node) + "." + rule_name
-
-        if full_rule_name not in log_node:
-            current_rule = resolve_class(log_node, rule_name)
+        full_rule_name = repr(logtype_node) + "." + rule_name
+        if full_rule_name not in logtype_node:
+            current_rule = resolve_class(logtype_node, rule_name)
             rule_node = current_rule()
-            log_node.add_child(rule_node)
+            logtype_node.add_child(rule_node)
         else:
-            rule_node = next((child for child in log_node.children if repr(child) == full_rule_name), None)
-        # Set or load Transformation objects
-        full_transformation_name = repr(rule_node) + "." + transformation_name
-        
-        if full_transformation_name not in rule_node:
-            current_transformation = resolve_class(rule_node, transformation_name)
-            transformation_node = current_transformation()
-            rule_node.add_child(transformation_node)
-        else:
-            transformation_node = next((child for child in rule_node.children if repr(child) == full_transformation_name), None)
-            
-        # Set or load Endpoints
-        endpoint_class = self._endpoints[dest_name]["class"]
-        transformation_node.add_child(endpoint_class(dest_name, **self._endpoints[dest_name]["vars"]))
+            rule_node = next((child for child in logtype_node.children if repr(child) == full_rule_name), None)
 
-    def load_destinations(self, plugin_name, endpoint_name, dest_name, dest_vars):
-        dest_plugin = import_plugin(f"{ENDPOINT_PLUGIN_RPATH}.{plugin_name}")
-        dest_class = resolve_class(dest_plugin, endpoint_name)
-        self._endpoints[dest_name] = {"class": dest_class,
-                                      "vars": dest_vars}
+        # Set or load transformer objects
+        full_transformer_name = repr(rule_node) + "." + transformer_name
+        if full_transformer_name not in rule_node:
+            current_transformer = resolve_class(rule_node, transformer_name)
+            transformer_node = current_transformer()
+            rule_node.add_child(transformer_node)
+        else:
+            transformer_node = next((child for child in rule_node.children if repr(child) == full_transformer_name), None)
+            
+        # Set or load Destinations
+        destination_class = self._destinations[destination_name]["class"]
+        transformer_node.add_child(destination_class(destination_name, **self._destinations[destination_name]["vars"]))
+
+    def load_destinations(self, plugin_name, endpoint_name, destination_name, destination_vars):
+        endpoint_plugin = import_plugin(f"{ENDPOINT_PLUGIN_RPATH}.{plugin_name}")
+        endpoint_class = resolve_class(endpoint_plugin, endpoint_name)
+        self._destinations[destination_name] = {"class": endpoint_class,
+                                      "vars": destination_vars}
 
     def get_paths(self):
         return list(self._workflows.keys())

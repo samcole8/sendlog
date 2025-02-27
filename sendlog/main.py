@@ -6,15 +6,18 @@ import threading
 import queue
 import time
 
+CONFIG_PATH = "/etc/sendlog/sendlog.yml"
+PLUGIN_DIR = "plugins"
+
 def process_workflows(workflow_queue):
     while True:
         workflow, msg = workflow_queue.get()
-        workflow.execute(msg)
+        workflow._execute(msg)
         workflow_queue.task_done()
 
 def main():
     # Load config into ConfigHandler
-    config_handler = ConfigHandler("sendlog.yml")
+    config_handler = ConfigHandler(CONFIG_PATH)
     
     # Create WorkflowManager
     workflow_manager = WorkflowManager()
