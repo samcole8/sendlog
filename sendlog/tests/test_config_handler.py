@@ -11,14 +11,14 @@ class TestConfigHandler(unittest.TestCase):
             "files": {
                 "/var/auth.log": {
                     "plugin": "myplugin",
-                    "format": "MyLog",
+                    "log_type": "MyLogType",
                     "rules": {
                         "MyRule": {
-                            "transformations": {
-                                "MyTransformation": {
+                            "transformers": {
+                                "MyTransformer": {
                                     "destinations": ["myendpoint"]
                                 },
-                                "MyOtherTransformation": {
+                                "MyOtherTransformer": {
                                     "destinations": ["myendpoint3"]
                                 }
                             }
@@ -27,11 +27,11 @@ class TestConfigHandler(unittest.TestCase):
                 },
                 "/var/app.log": {
                     "plugin": "appplugin",
-                    "format": "MyLog",
+                    "log_type": "MyLogType",
                     "rules": {
                         "AppRule": {
-                            "transformations": {
-                                "AppTransformation": {
+                            "transformers": {
+                                "AppTransformer": {
                                     "destinations": ["appendpoint1", "appendpoint2"]
                                 }
                             }
@@ -40,11 +40,11 @@ class TestConfigHandler(unittest.TestCase):
                 },
                 "/var/transaction.log": {
                     "plugin": "transactionplugin",
-                    "format": "MyLog",
+                    "log_type": "MyLogType",
                     "rules": {
                         "TransactionRule": {
-                            "transformations": {
-                                "TransactionTransformation": {
+                            "transformers": {
+                                "TransactionTransformer": {
                                     "destinations": ["transendpoint1", "transendpoint2"]
                                 }
                             }
@@ -57,12 +57,12 @@ class TestConfigHandler(unittest.TestCase):
         config_handler = ConfigHandler("test_config.yml")
         data = list(config_handler.files())
         expected_data = [
-            ('/var/auth.log', 'myplugin', 'MyLog' ,'MyRule', 'MyTransformation', 'myendpoint'),
-            ('/var/auth.log', 'myplugin', 'MyLog' ,'MyRule', 'MyOtherTransformation', 'myendpoint3'),
-            ('/var/app.log', 'appplugin', 'MyLog' ,'AppRule', 'AppTransformation', 'appendpoint1'),
-            ('/var/app.log', 'appplugin', 'MyLog' ,'AppRule', 'AppTransformation', 'appendpoint2'),
-            ('/var/transaction.log', 'transactionplugin', 'MyLog' , 'TransactionRule', 'TransactionTransformation', 'transendpoint1'),
-            ('/var/transaction.log', 'transactionplugin', 'MyLog' ,'TransactionRule', 'TransactionTransformation', 'transendpoint2')
+            ('/var/auth.log', 'myplugin', 'MyLogType' ,'MyRule', 'MyTransformer', 'myendpoint'),
+            ('/var/auth.log', 'myplugin', 'MyLogType' ,'MyRule', 'MyOtherTransformer', 'myendpoint3'),
+            ('/var/app.log', 'appplugin', 'MyLogType' ,'AppRule', 'AppTransformer', 'appendpoint1'),
+            ('/var/app.log', 'appplugin', 'MyLogType' ,'AppRule', 'AppTransformer', 'appendpoint2'),
+            ('/var/transaction.log', 'transactionplugin', 'MyLogType' , 'TransactionRule', 'TransactionTransformer', 'transendpoint1'),
+            ('/var/transaction.log', 'transactionplugin', 'MyLogType' ,'TransactionRule', 'TransactionTransformer', 'transendpoint2')
         ]
         self.assertEqual(data, expected_data)
         mock_open.assert_called_with("test_config.yml", "r")
