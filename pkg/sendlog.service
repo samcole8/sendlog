@@ -1,0 +1,14 @@
+[Unit]
+Description=Sendlog Log Alerting Service
+After=basic.target
+
+[Service]
+WorkingDirectory=/opt/sendlog
+ExecStart=/opt/sendlog/venv/bin/python /opt/sendlog/sendlog/main.py
+Restart=always
+Environment=PATH=/opt/sendlog/sendlog
+Environment=VIRTUAL_ENV=/opt/sendlog/venv
+Environment=PYTHONUNBUFFERED=1
+
+[Install]
+WantedBy=multi-user.target
