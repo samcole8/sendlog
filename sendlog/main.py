@@ -1,5 +1,5 @@
-from utils.config_handler import ConfigHandler
-from utils.workflow_manager import WorkflowManager
+from config_handler import ConfigHandler
+from workflow_manager import WorkflowManager
 from log_monitor import LogMonitor
 
 import threading
