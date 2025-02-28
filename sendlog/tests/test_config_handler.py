@@ -1,6 +1,6 @@
 import unittest
 from unittest.mock import patch, MagicMock
-from utils.config_handler import ConfigHandler
+from config_handler import ConfigHandler
 
 class TestConfigHandler(unittest.TestCase):
 
