@@ -54,14 +54,15 @@ class Transformer(_WorkflowNode, metaclass=_TransformerMeta):
 
 class Endpoint(metaclass=_EndpointMeta):
     required_vars = []
-    def __init__(self, **kwargs):
+    def __init__(self, dest_name, **kwargs):
+        self.dest_name = dest_name
 
         # Assign variables and validate
         for key, value in kwargs.items():
             setattr(self, key, value)
 
     def __repr__(self):
-        return f"{self.__class__.__name__} ({self.dest_name})"
+        return f"{self.__class__.__module__}.{self.__class__.__qualname__} ({self.dest_name})"
 
     def send(self, msg):
         raise NotImplementedError
