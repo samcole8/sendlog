@@ -13,7 +13,9 @@ class _WorkflowNode:
     def __iter__(self):
         return iter(self.children)
 
-class _LogTypeMeta(type):
+# Metaclasses
+
+class _TransformerMeta(type):
     def __new__(cls, name, bases, dct):
         return super().__new__(cls, name, bases, dct)
 
@@ -21,7 +23,7 @@ class _RuleMeta(type):
     def __new__(cls, name, bases, dct):
         return super().__new__(cls, name, bases, dct)
 
-class _TransformerMeta(type):
+class _LogTypeMeta(type):
     def __new__(cls, name, bases, dct):
         return super().__new__(cls, name, bases, dct)
 
@@ -29,10 +31,16 @@ class _EndpointMeta(type):
     def __new__(cls, name, bases, dct):
         return super().__new__(cls, name, bases, dct)
 
-class LogType(_WorkflowNode, metaclass=_LogTypeMeta):
+# Workflow classes
+
+class Transformer(_WorkflowNode, metaclass=_TransformerMeta):
     def _execute(self, line):
-        for rule in self.children:
-            rule._execute(line)
+        msg = self.transform(line)
+        for endpoint in self.children:
+            endpoint.send(msg)
+
+    def transform(self, line):
+        raise NotImplementedError
 
 class Rule(_WorkflowNode, metaclass=_RuleMeta):
     def _execute(self, line):
@@ -43,14 +51,10 @@ class Rule(_WorkflowNode, metaclass=_RuleMeta):
     def evaluate(self, line):
         raise NotImplementedError
 
-class Transformer(_WorkflowNode, metaclass=_TransformerMeta):
+class LogType(_WorkflowNode, metaclass=_LogTypeMeta):
     def _execute(self, line):
-        msg = self.transform(line)
-        for endpoint in self.children:
-            endpoint.send(msg)
-
-    def transform(self, line):
-        raise NotImplementedError
+        for rule in self.children:
+            rule._execute(line)
 
 class Endpoint(metaclass=_EndpointMeta):
     required_vars = []
