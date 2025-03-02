@@ -46,7 +46,7 @@ class WorkflowManager:
             
         # Set or load Destinations
         destination_class = self._destinations[destination_name]["class"]
-        transformer_node.add_child(destination_class(destination_name, **self._destinations[destination_name]["vars"]))
+        transformer_node.add_child(destination_class(destination_name, self._destinations[destination_name]["class"].__name__, **self._destinations[destination_name]["vars"]))
 
     def load_destinations(self, plugin_name, endpoint_name, destination_name, destination_vars):
         endpoint_plugin = import_plugin(f"{ENDPOINT_PLUGIN_RPATH}.{plugin_name}")

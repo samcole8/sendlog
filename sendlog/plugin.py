@@ -1,3 +1,5 @@
+from utils.errors import MissingVariableError, UnexpectedVariableError
+
 class _WorkflowNode:
     
     """Base class for workflow components"""
@@ -53,10 +55,22 @@ class Transformer(_WorkflowNode, metaclass=_TransformerMeta):
         raise NotImplementedError
 
 class Endpoint(metaclass=_EndpointMeta):
-    def __init__(self, dest_name, **kwargs):
+    required_vars = []
+    def __init__(self, dest_name, endpoint_name, **kwargs):
         self.dest_name = dest_name
+        self.endpoint_name = endpoint_name
+        
+        # Check if all required variables are provided
+        missing_vars = [var for var in self.required_vars if var not in kwargs]
+        if missing_vars:
+            raise MissingVariableError(self.dest_name, self.endpoint_name, missing_vars)
+
+        # Assign variables and validate
         for key, value in kwargs.items():
-            setattr(self, key, value)
+            if key not in self.required_vars:
+                raise UnexpectedVariableError(self.dest_name, self.endpoint_name, key)
+            else:
+                setattr(self, key, value)
 
     def __repr__(self):
         return f"{self.__class__.__name__} ({self.dest_name})"
