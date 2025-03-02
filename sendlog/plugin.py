@@ -56,21 +56,11 @@ class Transformer(_WorkflowNode, metaclass=_TransformerMeta):
 
 class Endpoint(metaclass=_EndpointMeta):
     required_vars = []
-    def __init__(self, dest_name, endpoint_name, **kwargs):
-        self.dest_name = dest_name
-        self.endpoint_name = endpoint_name
-        
-        # Check if all required variables are provided
-        missing_vars = [var for var in self.required_vars if var not in kwargs]
-        if missing_vars:
-            raise MissingVariableError(self.dest_name, self.endpoint_name, missing_vars)
+    def __init__(self, **kwargs):
 
         # Assign variables and validate
         for key, value in kwargs.items():
-            if key not in self.required_vars:
-                raise UnexpectedVariableError(self.dest_name, self.endpoint_name, key)
-            else:
-                setattr(self, key, value)
+            setattr(self, key, value)
 
     def __repr__(self):
         return f"{self.__class__.__name__} ({self.dest_name})"

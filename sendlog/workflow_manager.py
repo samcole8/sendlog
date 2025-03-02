@@ -1,5 +1,7 @@
 from importlib import import_module
 
+from utils.errors import EndpointVariableMismatchError
+
 FILE_PLUGIN_RPATH = "plugins.workflows"
 ENDPOINT_PLUGIN_RPATH = "plugins.endpoints"
 
@@ -47,13 +49,14 @@ class WorkflowManager:
         # Set or load Destinations
         destination_class = self._destinations[destination_name]["class"]
         destination_vars = self._destinations[destination_name]["vars"] or {}
-        transformer_node.add_child(destination_class(destination_name, destination_class.__name__, **destination_vars))
+        transformer_node.add_child(destination_class(**destination_vars))
 
     def load_destinations(self, plugin_name, endpoint_name, destination_name, destination_vars):
         endpoint_plugin = import_plugin(f"{ENDPOINT_PLUGIN_RPATH}.{plugin_name}")
         endpoint_class = resolve_class(endpoint_plugin, endpoint_name)
-        self._destinations[destination_name] = {"class": endpoint_class,
-                                      "vars": destination_vars}
+        self._destinations[destination_name] = {"class": endpoint_class, "vars": destination_vars}
+        if set(endpoint_class.required_vars) != set(destination_vars.keys()):
+            raise EndpointVariableMismatchError(destination_name, endpoint_name, set(endpoint_class.required_vars), set(destination_vars.keys()))
 
     def get_paths(self):
         return list(self._workflows.keys())
