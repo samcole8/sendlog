@@ -34,7 +34,7 @@ class ConfigHandler:
         
         def files():
             for path, file_config in get_val("files", self._config, dict).items():
-                yield path, file_config["plugin"], file_config["log_type"], file_config
+                yield path, get_val("plugin", file_config, str), get_val("log_type", file_config, str), file_config
         
         def rules(file_config):
             for rule_name, rule_config in get_val("rules", file_config, dict).items():
