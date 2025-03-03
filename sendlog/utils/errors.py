@@ -15,3 +15,13 @@ class PluginClassNotFoundError(Exception):
 class DestinationUndefinedError(Exception):
     def __init__(self, dest_name):
         super().__init__(f"Invalid configuration file: The referenced destination '{dest_name}' is undefined.")
+
+# Config Errors
+
+class ConfigurationKeyError(Exception):
+    def __init__(self, key):
+        super().__init__(f"Expected key '{key}' could not be found.")
+
+class ConfigurationTypeError(Exception):
+    def __init__(self, expected, got):
+        super().__init__(f"Expected '{expected}' but got '{got}'.")
