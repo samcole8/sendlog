@@ -50,25 +50,33 @@ class Rule(_WorkflowNode, metaclass=_RuleMeta):
     
     def evaluate(self, line):
         raise NotImplementedError
+    
+    class Raw(Transformer):
+        def transform(self, line):
+            return line
 
 class LogType(_WorkflowNode, metaclass=_LogTypeMeta):
     def _execute(self, line):
         for rule in self.children:
             rule._execute(line)
+    
+    class Always(Rule):
+        def evaluate(self, line):
+            return True
 
 class Endpoint(metaclass=_EndpointMeta):
     required_vars = []
-    def __init__(self, dest_name, **kwargs):
-        self.dest_name = dest_name
+    def __init__(self, name, **kwargs):
+        self.name = name
 
-        # Assign variables and validate
         for key, value in kwargs.items():
             setattr(self, key, value)
 
     def __repr__(self):
-        return f"{self.__class__.__module__}.{self.__class__.__qualname__} ({self.dest_name})"
+        return f"{self.__class__.__module__}.{self.__class__.__qualname__} <- {self.name}"
 
     def send(self, msg):
         raise NotImplementedError
+
 
 __all__ = ["LogType", "Rule", "Transformer", "Endpoint"]
