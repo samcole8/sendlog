@@ -1,10 +1,13 @@
-class _WorkflowNode:
+from utils.errors import PluginOverrideError
+import sys
+
+class _WorkflowNode():
     
     """Base class for workflow components"""
     def __init__(self):
         self.children = []
 
-    def add_child(self, child_node):
+    def _add_child(self, child_node):
         self.children.append(child_node)
 
     def __repr__(self):
@@ -15,20 +18,46 @@ class _WorkflowNode:
 
 # Metaclasses
 
-class _TransformerMeta(type):
+class _NodeMeta(type):
+    """Enforce elements for all plugins"""
     def __new__(cls, name, bases, dct):
+        # Prevent `_execute` method from being overwritten if it is already defined
+        if "_execute" in dct:
+            if any("_execute" in base.__dict__ for base in bases):
+                raise PluginOverrideError(name, "_execute")
+
+        # Prevent node members from being overwritten
+        restricted_members = ["__init__", "__repr__", "__iter__", "_add_child"]
+        for member in restricted_members:
+            if member in dct:
+                raise PluginOverrideError(name, member)
         return super().__new__(cls, name, bases, dct)
 
-class _RuleMeta(type):
+class _TransformerMeta(_NodeMeta):
+    """Enforce Transformers can only exist inside Rules"""
     def __new__(cls, name, bases, dct):
+        
         return super().__new__(cls, name, bases, dct)
 
-class _LogTypeMeta(type):
+class _RuleMeta(_NodeMeta):
+    """Enforce that rules can only exist inside LogTypes"""
+    def __new__(cls, name, bases, dct):
+        
+        return super().__new__(cls, name, bases, dct)
+
+class _LogTypeMeta(_NodeMeta):
+    """Enforce that LogType is a base-level class."""
     def __new__(cls, name, bases, dct):
         return super().__new__(cls, name, bases, dct)
 
 class _EndpointMeta(type):
     def __new__(cls, name, bases, dct):
+        if "__init__" in dct:
+            if any("__init__" in base.__dict__ for base in bases):
+                raise PluginOverrideError(name, "__init__")
+        if "__repr__" in dct:
+            if any("__repr__" in base.__dict__ for base in bases):
+                raise PluginOverrideError(name, "__repr__")
         return super().__new__(cls, name, bases, dct)
 
 # Workflow classes
@@ -77,6 +106,5 @@ class Endpoint(metaclass=_EndpointMeta):
 
     def send(self, msg):
         raise NotImplementedError
-
 
 __all__ = ["LogType", "Rule", "Transformer", "Endpoint"]

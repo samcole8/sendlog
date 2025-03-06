@@ -40,7 +40,7 @@ class WorkflowManager:
             if rule_id not in logtype_node:
                 Rule = resolve_class(logtype_node, rule_name)
                 rule_node = Rule()
-                logtype_node.add_child(rule_node)
+                logtype_node._add_child(rule_node)
             else:
                 rule_node = next((child for child in logtype_node.children if child == rule_id), None)
             return rule_node
@@ -55,7 +55,7 @@ class WorkflowManager:
             destination_vars = self._destinations[destination_name]["vars"] or {}
             # Instantiate the destination object
             destination_node = Endpoint(destination_name, **destination_vars)
-            transformer_node.add_child(destination_node)
+            transformer_node._add_child(destination_node)
             return destination_node
 
         logtype_node = _set_logtype(file_path, plugin_name, logtype_name)
