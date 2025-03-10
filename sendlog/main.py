@@ -12,7 +12,7 @@ PLUGIN_DIR = "plugins"
 def process_workflows(workflow_queue):
     while True:
         workflow, msg = workflow_queue.get()
-        workflow._execute(msg)
+        workflow(msg)
         workflow_queue.task_done()
 
 def main():
@@ -24,7 +24,7 @@ def main():
 
     # Load destinations from config
     for data in config_handler.destinations():
-        workflow_manager.load_destinations(*data)
+        workflow_manager.load_endpoint(*data)
 
     # Load file workflows from config
     for data in config_handler.files():
