@@ -130,7 +130,10 @@ class WorkflowManager:
         
         def _set_endpoint(transformer_node, endpoint_name):
             # Extract Endpoint class and destination variables
-            endpoint_data = self._endpoints[endpoint_name]
+            try:
+                endpoint_data = self._endpoints[endpoint_name]
+            except KeyError as e:
+                raise DestinationUndefinedError(endpoint_name)
             endpoint_kwargs = endpoint_data["kwargs"] or {}
             ChannelPlugin = endpoint_data["channel"]
             sub_node = WorkflowNode(Endpoint, ChannelPlugin(endpoint_name, **endpoint_kwargs))
