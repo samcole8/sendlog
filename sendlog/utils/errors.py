@@ -60,6 +60,10 @@ class PluginHierarchyError(PluginError):
     def __init__(self, subclass, member):
         super().__init__("PLUGIN_HIERARCHY", f"Plugin subclass '{subclass}' was rejected because it was defined in an unexpected place '{member}'")
 
+class PluginInitError(PluginError):
+    def __init__(self, subclass, params):
+        super().__init__("PLUGIN_INIT", f"Plugin subclass '{subclass}' was rejected because the '__init__' method contained a parameter other than 'self'; got '{params}' instead.")
+
 # Worker runtime errors that occur when sending an alert
 
 class WorkerError(SendlogError):

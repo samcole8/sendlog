@@ -1,4 +1,4 @@
-from utils.errors import PluginOverrideError
+from utils.errors import PluginOverrideError, PluginInitError
 import sys
 
 # Metaclasses
@@ -6,6 +6,12 @@ import sys
 class _NodeMeta(type):
     """Enforce elements for all plugins"""
     def __new__(cls, name, bases, dct):
+        # Prevent parameters other than self in __init__ methods
+        if "__init__" in dct:
+            init_method = dct["__init__"]
+            init_params = init_method.__code__.co_varnames[1:]
+            if init_params:
+                raise PluginInitError(name, init_method.__code__.co_varnames)
         return super().__new__(cls, name, bases, dct)
 
 class _TransformerMeta(_NodeMeta):
