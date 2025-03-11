@@ -109,7 +109,12 @@ class WorkflowManager:
                 raise DestinationUndefinedError(endpoint_name)
             endpoint_kwargs = endpoint_data["kwargs"] or {}
             ChannelPlugin = endpoint_data["channel"]
-            sub_node = WorkflowNode(Channel, ChannelPlugin(endpoint_name, **endpoint_kwargs))
+            try:
+                channel_obj = ChannelPlugin(endpoint_name, **endpoint_kwargs)
+            except TypeError:
+                raise PluginInheritanceError(clsi.cls_name(ChannelPlugin), clsi.cls_name(Channel) ,clsi.cls_bases(ChannelPlugin))
+            sub_node = WorkflowNode(Channel, channel_obj)
+
             transformer_node.add(sub_node)
             return sub_node
 
@@ -127,6 +132,7 @@ class WorkflowManager:
     def load_endpoint(self, plugin_name: str, channel_name: str, endpoint_name: str, endpoint_kwargs: dict):
         plugin = import_plugin(plugin_name, plugin_type="endpoint")
         ChannelPlugin = resolve_class(plugin, channel_name)
+
         self._endpoints[endpoint_name] = {"channel": ChannelPlugin, "kwargs": endpoint_kwargs}
         if endpoint_kwargs is None:
             kws = set()
@@ -139,9 +145,7 @@ class WorkflowManager:
         return list(self._workflows.keys())
 
     def display_nodes(self):
-
         for key, node in self._workflows.items():
-            print()
             print(key)
             print(clsi.obj_fullname(node.obj))
             for subnode in node:
@@ -150,6 +154,7 @@ class WorkflowManager:
                     print("   ", clsi.obj_fullname(subnode.obj))
                     for subnode in subnode:
                         print("     ", clsi.obj_fullname(subnode.obj), "->", subnode.obj.name)
+        print()
 
     def get_workflow(self, path):
         """Return a 'black-box' function that executes a workflow."""
