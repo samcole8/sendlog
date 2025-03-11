@@ -3,7 +3,7 @@
 [Back to Contents](..)
 
 - [Overview](#overview)
-- [Destinations](#destinations)
+- [Endpoints](#endpoints)
   - [Fields](#fields)
   - [Structure](#structure)
   - [Example](#example)
@@ -14,30 +14,30 @@
 
 ### Overview
 
-The configuration file defines active alert workflows and endpoint configurations (called destinations). At the bare minimum, you must define one destination and one file for an alert to function.
+The configuration file defines active alert workflows and endpoints. At the bare minimum, you must define one endpoint and one file workflow for an alert to function.
 
-### Destinations
+### Endpoints
 
-Before configuring a workflow, at least one destination is required. The `destinations` section defines a place an alert can go, and provides any information it needs to get there.
+Once instantiated, a Channel is called an endpoint. It represents the destination itself.
+
+Before configuring a workflow, at least one endpoint is required. They can be defined in the `endpoints` section of the configuration file and re-used for different workflows.
 
 #### Fields
 
-| Field                | Type   | Required | Description                                                               |
-| -------------------- | ------ | -------- | ------------------------------------------------------------------------- |
-| `<destination_name>` | string | Yes      | Arbitrary unique identifier for the destination.                          |
-| `plugin`             | string | Yes      | Module for the endpoint plugin that will handle the alert.                |
-| `endpoint`           | string | Yes      | Endpoint class within the specified plugin (e.g., `Console`, `Telegram`). |
-| `vars`               | map    | No       | Dictionary of custom variables required by the specified Endpoint.        |
-
-You can have multiple instances of the same endpoint, for example to send alerts to different accounts or locations.
+| Field             | Type   | Required | Description                                                              |
+| ----------------- | ------ | -------- | ------------------------------------------------------------------------ |
+| `<endpoint_name>` | string | Yes      | Arbitrary unique identifier for the destination.                         |
+| `plugin`          | string | Yes      | Module for the endpoint plugin that will handle the alert.               |
+| `channel`         | string | Yes      | Channel class within the specified plugin (e.g., `Console`, `Telegram`). |
+| `vars`            | map    | No       | Dictionary of custom variables required by the specified Channel.        |
 
 #### Structure
 
 ```yaml
-destinations:
-  <destination_name>:
+endpoints:
+  <endpoint_name>:
     plugin: <plugin_name>
-    endpoint: <endpoint_type>
+    channel: <channel_class>
     vars:
       <key>: <value>
 ```
@@ -45,10 +45,10 @@ destinations:
 #### Example
 
 ```yaml
-destinations:
+endpoints:
   telegram_1:
     plugin: telegram
-    endpoint: Telegram
+    channel: Telegram
     vars:
       chat_id: <my_chat_id>
       token: <my_token>
@@ -56,23 +56,23 @@ destinations:
 
 ### Files
 
-The `files` section defines the alert workflows for each of the specified files.
+The `files` section defines the alert workflows for each of the specified files. Defining a workflow requires at least one endpoint to be configured.
 
 #### Fields
 
-| Field                 | Type   | Required | Description                                                      |
-| --------------------- | ------ | -------- | ---------------------------------------------------------------- |
-| `<file_path>`         | string | Yes      | Path to the file that should be monitored.                       |
-| `plugin`              | string | Yes      | Name of the module that will handle the alert.                   |
-| `log_type`            | string | Yes      | Name of the `LogType` subclass within the specified plugin.      |
-| `rules`               | map    | Yes      | Dictionary of rules.                                             |
-| `<rule_class>`        | string | Yes      | Name of the `Rule` subclass within the specified log type.       |
-| `transformers`        | map    | Yes      | Dictionary of transformers.                                      |
-| `<transformer_class>` | string | Yes      | Name of the `Transformer` subclass within the specified rule.    |
-| `destinations`        | list   | Yes      | List of destinations to send an alert to.                        |
-| `<destination_name>`  | string | Yes      | The name of a destination specified in the `destinations` block. |
+| Field                 | Type   | Required | Description                                                   |
+| --------------------- | ------ | -------- | ------------------------------------------------------------- |
+| `<file_path>`         | string | Yes      | Path to the file that should be monitored.                    |
+| `plugin`              | string | Yes      | Name of the module that will handle the alert.                |
+| `log_type`            | string | Yes      | Name of the `LogType` subclass within the specified plugin.   |
+| `rules`               | map    | Yes      | Dictionary of rules.                                          |
+| `<rule_class>`        | string | Yes      | Name of the `Rule` subclass within the specified log type.    |
+| `transformers`        | map    | Yes      | Dictionary of transformers.                                   |
+| `<transformer_class>` | string | Yes      | Name of the `Transformer` subclass within the specified rule. |
+| `endpoints`           | list   | Yes      | List of endpoints to send an alert to.                        |
+| `<endpoint_name>`     | string | Yes      | The name of an endpoint specified in the `endpoints` block.   |
 
-You can have multiple files, log types, rules, transformer and destinations under each respective parent key. Destinations can be re-used.
+You can have multiple files, log types, rules, transformer and endpoints under each parent key.
 
 #### Structure
 
@@ -85,8 +85,8 @@ files:
       <rule_class>:
         transformers:
           <transformer_class>:
-            destinations:
-              - <destination_name>
+            endpoints:
+              - <endpoint_name>
 ```
 
 #### Example
@@ -100,10 +100,10 @@ files:
       RunCommand:
         transformers:
           Human:
-            destinations:
+            endpoints:
               - telegram_1
           JSON:
-            destinations:
+            endpoints:
               - telegram_1
               - telegram_2
 ```
