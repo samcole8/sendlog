@@ -1,7 +1,7 @@
 from importlib import import_module
 
 from plugin import LogType, Rule, Transformer, Channel
-
+from utils import clsi
 from utils.errors import (EndpointVariableMismatchError,
                           PluginModuleNotFoundError,
                           PluginClassNotFoundError,
@@ -29,7 +29,7 @@ class WorkflowNode():
     """
     Wrapper for plugin classes.
     
-    Stores plugin objects as part of a hierarchy and provides an unintrusive interface for accessing information about a plugin's origin.
+    Store plugin objects as part of a hierarchy.
     """
 
     def __init__(self, base_cls, node_obj):
@@ -37,54 +37,23 @@ class WorkflowNode():
         self._node_obj = node_obj
         self._sub_nodes = []
         # Raise an error if the node object's class hasn't inherited from the specified base
-        if self._base_cls not in self.node_bases():
+        if self._base_cls not in clsi.obj_bases(self._node_obj):
             raise PluginInheritanceError(
-                                            self.node_fullname(),
-                                            self.base_fullname(),
+                                            clsi.obj_fullname(self._node_obj),
+                                            clsi.cls_fullname(self._base_cls),
                                             [
-                                                f"{base.__module__}.{base.__qualname__}"
-                                                for base in self.node_bases()
+                                                clsi.cls_fullname(base)
+                                                for base in clsi.cls_bases(self._base_cls)
                                             ]
                                         )
 
-    # Base information functions
-
-    def base_cls(self):
-        """Get the node's manually specified base class."""
+    @property
+    def obj(self):
+        return self._node_obj
+    
+    @property
+    def base(self):
         return self._base_cls
-
-    def base_name(self):
-        """Get the name of the node's manually specified base class."""
-        return self._base_cls.__name__
-
-    def base_fullname(self):
-        """Get the full name of the node's manually specified base class."""
-        return f"{self._base_cls.__module__}.{self._base_cls.__qualname__}"
-
-    # Node information functions
-
-    def node_class(self):
-        """Get node class."""
-        return self._node_obj.__class__
-
-    def node_bases(self):
-        """Get node class bases."""
-        return self._node_obj.__class__.__bases__
-
-    def node_name(self):
-        """Get node class name."""
-        return self._node_obj.__class__.__name__
-
-    def node_fullname(self):
-        """Get node class full name"""
-        return f"{self._node_obj.__class__.__module__}.{self._node_obj.__class__.__qualname__}"
-
-    # Other functions
-
-    def execute(self, arg):
-        """Execute a node object, assuming it is callable and takes one argument."""
-        result = self._node_obj(arg)
-        return result
 
     def __iter__(self):
         """Iterate through sub nodes."""
@@ -104,27 +73,32 @@ class WorkflowManager:
         
         def _set_logtype(file_path, plugin_name, logtype_name):
             if file_path not in self._workflows.keys():
+                print(f"Loaded workflows for file: {file_path}\n")
                 plugin = import_plugin(plugin_name)
                 LogTypePlugin = resolve_class(plugin, logtype_name)
                 self._workflows[file_path] = WorkflowNode(LogType, LogTypePlugin())
             return self._workflows[file_path]
 
         def _set_rule(node, name):
-            if not any(name == subnode.node_name() for subnode in node):
-                node_obj = resolve_class(node.node_class(), name)()
-                sub_node = WorkflowNode(Rule, node_obj)
+            # If rule node is not in logtype node
+            if not any(name == clsi.obj_name(subnode.obj) for subnode in node):
+                rule_obj = resolve_class(clsi.obj_class(node.obj), name)()
+                sub_node = WorkflowNode(Rule, rule_obj)
                 node.add(sub_node)
             else:
-                sub_node = next((sub_node for sub_node in node if sub_node.node_name() == name), None)
+                # Use existing rule node
+                sub_node = next((sub_node for sub_node in node if clsi.obj_name(sub_node.obj) == name), None)
             return sub_node
 
         def _set_transformer(node, name):
-            if not any(name == subnode.node_name() for subnode in node):
-                node_obj = resolve_class(node.node_class(), name)()
-                sub_node = WorkflowNode(Transformer, node_obj)
+            # If transformer node is not in rule node
+            if not any(name == clsi.obj_name(subnode.obj) for subnode in node):
+                transformer_obj = resolve_class(clsi.obj_class(node.obj), name)()
+                sub_node = WorkflowNode(Transformer, transformer_obj)
                 node.add(sub_node)
             else:
-                sub_node = next((sub_node for sub_node in node if sub_node.node_name() == name), None)
+                # Use existing transformer node
+                sub_node = next((sub_node for sub_node in node if clsi.obj_name(sub_node.obj) == name), None)
             return sub_node
         
         def _set_endpoint(transformer_node, endpoint_name):
@@ -144,10 +118,10 @@ class WorkflowManager:
         transformer_node = _set_transformer(rule_node, transformer_name)
         endpoint_node = _set_endpoint(transformer_node, endpoint_name)
 
-        print(logtype_node.base_name(),":", logtype_node.node_name())
-        print(rule_node.base_name(),":", rule_node.node_name())
-        print(transformer_node.base_name(),":", transformer_node.node_name())
-        print(endpoint_node.base_name(),":", endpoint_node.node_name())
+        print(clsi.cls_name(logtype_node.base),":", clsi.obj_name(logtype_node.obj))
+        print(clsi.cls_name(rule_node.base),":", clsi.obj_name(rule_node.obj))
+        print(clsi.cls_name(transformer_node.base),":", clsi.obj_name(transformer_node.obj))
+        print(clsi.cls_name(endpoint_node.base),":", clsi.obj_name(endpoint_node.obj), " -> ", endpoint_node.obj.name)
         print()
 
     def load_endpoint(self, plugin_name: str, channel_name: str, endpoint_name: str, endpoint_kwargs: dict):
@@ -164,16 +138,29 @@ class WorkflowManager:
     def get_paths(self):
         return list(self._workflows.keys())
 
+    def display_nodes(self):
+
+        for key, node in self._workflows.items():
+            print()
+            print(key)
+            print(clsi.obj_fullname(node.obj))
+            for subnode in node:
+                print(" ", clsi.obj_fullname(subnode.obj))
+                for subnode in subnode:
+                    print("   ", clsi.obj_fullname(subnode.obj))
+                    for subnode in subnode:
+                        print("     ", clsi.obj_fullname(subnode.obj), "->", subnode.obj.name)
+
     def get_workflow(self, path):
         """Return a 'black-box' function that executes a workflow."""
 
         log_node = self._workflows[path]
         def workflow(log_line):
             for rule_node in log_node:
-                if rule_node.execute(log_line) is True:
+                if rule_node.obj(log_line) is True:
                     for transformer_node in rule_node:
-                        msg = transformer_node.execute(log_line)
+                        msg = transformer_node.obj(log_line)
                         for endpoint_node in transformer_node:
-                            endpoint_node.execute(msg)
+                            endpoint_node.obj(msg)
 
         return workflow
