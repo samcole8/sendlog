@@ -1,5 +1,4 @@
 from importlib import import_module
-from abc import ABC
 
 from plugin import LogType, Rule, Transformer, Endpoint
 
@@ -26,9 +25,9 @@ def import_plugin(plugin_name, plugin_type="workflow"):
     except ModuleNotFoundError as e:
         raise PluginModuleNotFoundError(plugin_name) from e
 
-class WorkflowNode(ABC):
+class WorkflowNode():
     """
-    Wrapper object for plugin classes.
+    Wrapper for plugin classes.
     
     Stores plugin objects as part of a hierarchy and provides an unintrusive interface for accessing information about a plugin's origin.
     """
