@@ -6,13 +6,13 @@ files:
       MyRule:
         transformers:
           MyTransformer:
-            destinations:
-              - my_destination
+            endpoints:
+              - my_endpoint
 
-destinations:
-  my_destination:
+endpoints:
+  my_endpoint:
     plugin: my_plugin
-    endpoint: MyEndpoint
+    channel: MyChannel
     vars:
       my_username: username
       my_password: password
