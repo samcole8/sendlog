@@ -9,8 +9,8 @@ from utils.errors import (EndpointVariableMismatchError,
                           PluginInheritanceError)
 
 PLUGIN_RPATHS = {
-    "workflow": "plugins.workflows",
-    "endpoint": "plugins.endpoints"
+    "log": "plugins.logs",
+    "channel": "plugins.channels"
 }
 
 def resolve_class(parent, class_name):
@@ -19,7 +19,7 @@ def resolve_class(parent, class_name):
     except AttributeError as e:
         raise PluginClassNotFoundError(class_name, parent) from e
         
-def import_plugin(plugin_name, plugin_type="workflow"):
+def import_plugin(plugin_name, plugin_type="log"):
     try:
         return import_module(f"{PLUGIN_RPATHS[plugin_type]}.{plugin_name}")
     except ModuleNotFoundError as e:
@@ -130,7 +130,7 @@ class WorkflowManager:
         print()
 
     def load_endpoint(self, plugin_name: str, channel_name: str, endpoint_name: str, endpoint_kwargs: dict):
-        plugin = import_plugin(plugin_name, plugin_type="endpoint")
+        plugin = import_plugin(plugin_name, plugin_type="channel")
         ChannelPlugin = resolve_class(plugin, channel_name)
 
         self._endpoints[endpoint_name] = {"channel": ChannelPlugin, "kwargs": endpoint_kwargs}
@@ -154,7 +154,7 @@ class WorkflowManager:
                     print("   ", clsi.obj_fullname(subnode.obj))
                     for subnode in subnode:
                         print("     ", clsi.obj_fullname(subnode.obj), "->", subnode.obj.name)
-        print()
+            print()
 
     def get_workflow(self, path):
         """Return a 'black-box' function that executes a workflow."""
