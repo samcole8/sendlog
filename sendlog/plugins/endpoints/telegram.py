@@ -1,7 +1,7 @@
-from plugin import Endpoint
+from plugin import Channel
 import requests
 
-class Telegram(Endpoint):
+class Telegram(Channel):
     required_vars = ["chat_id", "token"]
 
     def __call__(self, msg):

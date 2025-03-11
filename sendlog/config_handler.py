@@ -44,22 +44,22 @@ class ConfigHandler:
             for transformer_name, transformer_config in get_val("transformers", rule_config, dict).items():
                 yield transformer_name, transformer_config
         
-        def destinations(transformer_config):
-            for destination_name in get_val("destinations", transformer_config, list):
-                yield destination_name
+        def endpoints(transformer_config):
+            for endpoint_name in get_val("endpoints", transformer_config, list):
+                yield endpoint_name
 
         for path, plugin_name, log_name, file_config in files():
             for rule_name, rule_config in rules(file_config):
                 for transformer_name, transformer_config in transformers(rule_config):
-                    for destination_name in destinations(transformer_config):
-                        for item in path, plugin_name, log_name, rule_name, transformer_name, destination_name:
+                    for endpoint_name in endpoints(transformer_config):
+                        for item in path, plugin_name, log_name, rule_name, transformer_name, endpoint_name:
                             if type(item) is not str:
                                 raise ConfigurationTypeError("str", type(item).__name__)
-                        yield path, plugin_name, log_name, rule_name, transformer_name, destination_name
+                        yield path, plugin_name, log_name, rule_name, transformer_name, endpoint_name
 
-    def destinations(self):
-        for dest_name, dest_config in get_val("destinations", self._config, dict).items():
-            plugin_name = get_val("plugin", dest_config, str)
-            endpoint_name =  get_val("endpoint", dest_config, str)
-            dest_vars = dest_config.get("vars", None)
-            yield plugin_name, endpoint_name, dest_name, dest_vars
+    def endpoints(self):
+        for endpoint_name, endpoint_config in get_val("endpoints", self._config, dict).items():
+            plugin_name = get_val("plugin", endpoint_config, str)
+            channel_name =  get_val("channel", endpoint_config, str)
+            endpoint_vars = endpoint_config.get("vars", None)
+            yield plugin_name, channel_name, endpoint_name, endpoint_vars

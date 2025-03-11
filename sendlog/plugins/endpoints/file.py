@@ -1,8 +1,8 @@
 """Log your logs."""
 
-from plugin import Endpoint
+from plugin import Channel
 
-class File(Endpoint):
+class File(Channel):
     required_vars = ["path"]
 
     def __call__(self, msg):

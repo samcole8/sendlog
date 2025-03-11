@@ -1,6 +1,6 @@
 from importlib import import_module
 
-from plugin import LogType, Rule, Transformer, Endpoint
+from plugin import LogType, Rule, Transformer, Channel
 
 from utils.errors import (EndpointVariableMismatchError,
                           PluginModuleNotFoundError,
@@ -128,14 +128,14 @@ class WorkflowManager:
             return sub_node
         
         def _set_endpoint(transformer_node, endpoint_name):
-            # Extract Endpoint class and destination variables
+            # Extract Channel class and endpoint variables
             try:
                 endpoint_data = self._endpoints[endpoint_name]
             except KeyError as e:
                 raise DestinationUndefinedError(endpoint_name)
             endpoint_kwargs = endpoint_data["kwargs"] or {}
             ChannelPlugin = endpoint_data["channel"]
-            sub_node = WorkflowNode(Endpoint, ChannelPlugin(endpoint_name, **endpoint_kwargs))
+            sub_node = WorkflowNode(Channel, ChannelPlugin(endpoint_name, **endpoint_kwargs))
             transformer_node.add(sub_node)
             return sub_node
 
@@ -152,14 +152,14 @@ class WorkflowManager:
 
     def load_endpoint(self, plugin_name: str, channel_name: str, endpoint_name: str, endpoint_kwargs: dict):
         plugin = import_plugin(plugin_name, plugin_type="endpoint")
-        Channel = resolve_class(plugin, channel_name)
-        self._endpoints[endpoint_name] = {"channel": Channel, "kwargs": endpoint_kwargs}
+        ChannelPlugin = resolve_class(plugin, channel_name)
+        self._endpoints[endpoint_name] = {"channel": ChannelPlugin, "kwargs": endpoint_kwargs}
         if endpoint_kwargs is None:
             kws = set()
         else:
             kws = set(endpoint_kwargs.keys())
-        if kws != set(Channel.required_vars):
-            raise EndpointVariableMismatchError(endpoint_name, channel_name, set(Channel.required_vars), kws)
+        if kws != set(ChannelPlugin.required_vars):
+            raise EndpointVariableMismatchError(endpoint_name, channel_name, set(ChannelPlugin.required_vars), kws)
 
     def get_paths(self):
         return list(self._workflows.keys())

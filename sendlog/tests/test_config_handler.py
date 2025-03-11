@@ -16,10 +16,10 @@ class TestConfigHandler(unittest.TestCase):
                         "MyRule": {
                             "transformers": {
                                 "MyTransformer": {
-                                    "destinations": ["myendpoint"]
+                                    "endpoints": ["myendpoint"]
                                 },
                                 "MyOtherTransformer": {
-                                    "destinations": ["myendpoint3"]
+                                    "endpoints": ["myendpoint3"]
                                 }
                             }
                         }
@@ -32,7 +32,7 @@ class TestConfigHandler(unittest.TestCase):
                         "AppRule": {
                             "transformers": {
                                 "AppTransformer": {
-                                    "destinations": ["appendpoint1", "appendpoint2"]
+                                    "endpoints": ["appendpoint1", "appendpoint2"]
                                 }
                             }
                         }
@@ -45,7 +45,7 @@ class TestConfigHandler(unittest.TestCase):
                         "TransactionRule": {
                             "transformers": {
                                 "TransactionTransformer": {
-                                    "destinations": ["transendpoint1", "transendpoint2"]
+                                    "endpoints": ["transendpoint1", "transendpoint2"]
                                 }
                             }
                         }

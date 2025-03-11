@@ -27,7 +27,7 @@ class _LogTypeMeta(_NodeMeta):
     def __new__(cls, name, bases, dct):
         return super().__new__(cls, name, bases, dct)
 
-class _EndpointMeta(ABCMeta):
+class _ChannelMeta(ABCMeta):
     def __new__(cls, name, bases, dct):
         if "__init__" in dct:
             if any("__init__" in base.__dict__ for base in bases):
@@ -58,7 +58,7 @@ class LogType(ABC, metaclass=_LogTypeMeta):
         def __call__(self, line):
             return True
 
-class Endpoint(ABC, metaclass=_EndpointMeta):
+class Channel(ABC, metaclass=_ChannelMeta):
     required_vars = []
     def __init__(self, name, **kwargs):
         self.name = name
@@ -70,4 +70,4 @@ class Endpoint(ABC, metaclass=_EndpointMeta):
     def __call__(self, msg):
         pass
 
-__all__ = ["LogType", "Rule", "Transformer", "Endpoint"]
+__all__ = ["LogType", "Rule", "Transformer", "Channel"]

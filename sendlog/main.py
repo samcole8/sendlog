@@ -7,7 +7,6 @@ import queue
 import time
 
 CONFIG_PATH = "/etc/sendlog/sendlog.yml"
-PLUGIN_DIR = "plugins"
 
 def process_workflows(workflow_queue):
     while True:
@@ -22,8 +21,8 @@ def main():
     # Create WorkflowManager
     workflow_manager = WorkflowManager()
 
-    # Load destinations from config
-    for data in config_handler.destinations():
+    # Load endpoints from config
+    for data in config_handler.endpoints():
         workflow_manager.load_endpoint(*data)
 
     # Load file workflows from config
