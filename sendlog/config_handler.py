@@ -62,4 +62,4 @@ class ConfigHandler:
             plugin_name = get_val("plugin", endpoint_config, str)
             channel_name =  get_val("channel", endpoint_config, str)
             endpoint_vars = endpoint_config.get("vars", None)
-            yield plugin_name, channel_name, endpoint_name, endpoint_vars
+            yield plugin_name, channel_name, endpoint_name, endpoint_vars or {}

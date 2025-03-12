@@ -27,9 +27,9 @@ def main():
 
     # Load file workflows from config
     for data in config_handler.files():
-        workflow_manager.load_workflow(*data)
+        workflow_manager.load_file(*data)
     
-    workflow_manager.display_nodes()
+    workflow_manager.display_worktrees()
 
     # Set up worker thread
     workflow_queue = queue.Queue()
