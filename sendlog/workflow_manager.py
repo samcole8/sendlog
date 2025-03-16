@@ -150,15 +150,6 @@ class WorkflowManager():
         endpoint_node = EndpointNode(channel_cls, endpoint_kwargs, endpoint_name)
         transformer_node.add(endpoint_node)
 
-        # Display workflow
-        print("WORKFLOW LOADED:\n")
-        print("File", ":", file_path)
-        print("LogType",":", clsi.obj_name(logtype_node.plugin_obj))
-        print("Rule",":", clsi.obj_name(rule_node.plugin_obj))
-        print("Transformer", ":", clsi.obj_name(transformer_node.plugin_obj))
-        print("Channel",":", clsi.obj_name(endpoint_node.plugin_obj), f"({endpoint_node.endpoint_name})")
-        print()
-
     def load_endpoint(self, plugin_name: str, channel_name: str, endpoint_name: str, endpoint_kwargs: dict):
         # Resolve channel class
         plugin_mod = import_plugin(plugin_name, "channels")
