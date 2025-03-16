@@ -2,6 +2,8 @@ from config_handler import ConfigHandler
 from workflow_manager import WorkflowManager
 from log_monitor import LogMonitor
 
+from utils import log
+import logging
 import threading
 import queue
 import time
@@ -15,9 +17,14 @@ def process_workflows(workflow_queue):
         workflow_queue.task_done()
 
 def main():
+
     # Load config into ConfigHandler
     config_handler = ConfigHandler(CONFIG_PATH)
     
+    # Start logging
+    log.config(config_handler.log_path)
+    logger = logging.getLogger(__name__)
+
     # Create WorkflowManager
     workflow_manager = WorkflowManager()
 

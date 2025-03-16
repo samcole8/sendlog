@@ -1,4 +1,4 @@
-from utils.errors import ConfigurationKeyError, ConfigurationTypeError
+from utils.errors import ConfigKeyError, ConfigTypeError
 
 from importlib import import_module
 import yaml
@@ -7,11 +7,11 @@ def get_val(key, dicti, enforced_type=None):
     try:
         val = dicti[key]
     except (KeyError, TypeError) as e:
-        raise ConfigurationKeyError(key) from e
+        raise ConfigKeyError(key) from e
 
     if enforced_type != None:
         if type(val) is not enforced_type:
-            raise ConfigurationTypeError(enforced_type.__name__, type(val).__name__)
+            raise ConfigTypeError(enforced_type.__name__, type(val).__name__)
     return dicti[key]
 
 class ConfigHandler:
@@ -54,7 +54,7 @@ class ConfigHandler:
                     for endpoint_name in endpoints(transformer_config):
                         for item in path, plugin_name, log_name, rule_name, transformer_name, endpoint_name:
                             if type(item) is not str:
-                                raise ConfigurationTypeError("str", type(item).__name__)
+                                raise ConfigTypeError("str", type(item).__name__)
                         yield path, plugin_name, log_name, rule_name, transformer_name, endpoint_name
 
     def endpoints(self):
@@ -63,3 +63,21 @@ class ConfigHandler:
             channel_name =  get_val("channel", endpoint_config, str)
             endpoint_vars = endpoint_config.get("vars", None)
             yield plugin_name, channel_name, endpoint_name, endpoint_vars or {}
+
+    @property
+    def log_path(self):
+        """Return path to log file."""
+        # Get log file path or use a default
+        log_path = self._config.get("path", "sendlog.log")
+        if type(log_path) is not str:
+            raise ConfigTypeError("str", log_path)
+        return log_path
+
+    @property
+    def log(self):
+        """Return boolean to determine if logging is on or off."""
+        # Get boolean from config file or use default
+        log = self._config.get("log", True)
+        if type(log) is not bool:
+            raise ConfigTypeError("bool", log)
+        return log
