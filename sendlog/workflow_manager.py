@@ -3,11 +3,13 @@ from importlib import import_module
 
 from plugin import LogType, Rule, Transformer, Channel
 from utils import clsi
-from utils.errors import (EndpointVariableMismatchError,
-                          PluginModuleNotFoundError,
-                          PluginClassNotFoundError,
-                          DestinationUndefinedError,
-                          PluginInheritanceError)
+from utils.errors import (
+    PluginClassNotFoundError,
+    PluginModuleNotFoundError,
+    PluginInheritanceError,
+    EndpointUndefinedError,
+    EndpointVariableMismatchError
+    )
 
 PLUGIN_HIERARCHY = {0: LogType,
                     1: Rule,
@@ -18,13 +20,14 @@ def resolve_class(parent, class_name):
     try:
         return getattr(parent, class_name)
     except AttributeError as e:
-        raise PluginClassNotFoundError(class_name, parent)
+        raise PluginClassNotFoundError(class_name, clsi.cls_fullname(parent))
         
 def import_plugin(plugin_name, plugin_type):
+    plugin_fullname = f"plugins.{plugin_type}.{plugin_name}"
     try:
-        return import_module(f"plugins.{plugin_type}.{plugin_name}")
+        return import_module(plugin_fullname)
     except ModuleNotFoundError as e:
-        raise PluginModuleNotFoundError(plugin_name)
+        raise PluginModuleNotFoundError(plugin_fullname)
 
 class WorkflowNode(ABC):
     """
@@ -40,7 +43,7 @@ class WorkflowNode(ABC):
         self._subnodes = []
         # Validate plugin class
         if self.base_cls not in self.plugin_cls.__bases__:
-            raise PluginInheritanceError(self.plugin_cls.__name__, self.base_cls.__name__, [base.__name__ for base in self.plugin_cls.__bases__])
+            raise PluginInheritanceError(clsi.cls_fullname(self.plugin_cls), self.base_cls.__name__, clsi.cls_bases(self.plugin_cls))
         # Instantiate plugin class
         self._inst_plugin()
 
@@ -66,7 +69,7 @@ class WorkflowNode(ABC):
     def add(self, subnode):
         # Validate subnode inherits from the correct plugin class
         if PLUGIN_HIERARCHY[self._level + 1] not in subnode.plugin_cls.__bases__:
-            raise PluginInheritanceError(self.plugin_cls.__name__, self.base_cls.__name__, [base.__name__ for base in subnode.plugin_cls.__bases__])
+            raise PluginInheritanceError(subnode.plugin_cls.__name__, subnode.base_cls.__name__, clsi.cls_bases(subnode.plugin_cls))
         # Add subnode to node
         self._subnodes.append(subnode)
 
@@ -141,7 +144,7 @@ class WorkflowManager():
         try:
             endpoint_data = self._endpoints[endpoint_name]
         except KeyError:
-            raise DestinationUndefinedError(endpoint_name)
+            raise EndpointUndefinedError(endpoint_name, file_path)
         channel_cls = endpoint_data["channel_cls"]
         endpoint_kwargs = endpoint_data["kwargs"]
         endpoint_node = EndpointNode(channel_cls, endpoint_kwargs, endpoint_name)
