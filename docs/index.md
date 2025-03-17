@@ -17,3 +17,7 @@ sendlog is a lightweight, extensible log monitoring framework with rule-based al
   - [Overview](configuration-file.md#overview)
   - [Destinations](configuration-file.md#destinations)
   - [Files](configuration-file.md#files)
+- [Logging and Errors](logging.md)
+  - [Overview](logging.md#overview)
+  - [Error codes](logging.md#error-codes)
+  - [Fallback alerts and error reporting](logging.md#fallback-alerts-and-error-reporting)

@@ -1,3 +1,5 @@
+log_path: /path/to/my.log
+
 files:
   /var/auth.log:
     plugin: my_plugin
