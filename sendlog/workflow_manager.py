@@ -1,6 +1,8 @@
 from abc import ABC, abstractmethod
 from importlib import import_module
+import logging
 
+from utils import log
 from plugin import LogType, Rule, Transformer, Channel
 from utils import clsi
 from utils.errors import (
@@ -8,7 +10,10 @@ from utils.errors import (
     PluginModuleNotFoundError,
     PluginInheritanceError,
     EndpointUndefinedError,
-    EndpointVariableMismatchError
+    EndpointVariableMismatchError,
+    RuleError,
+    TransformerError,
+    EndpointError
     )
 
 PLUGIN_HIERARCHY = {0: LogType,
@@ -165,20 +170,74 @@ class WorkflowManager():
     def get_workflow(self, path):
         """Return a 'black-box' function that executes a workflow."""
 
+        def workflow_tracestack(*args):
+            """Get the full names of multiple workflow components for debugging."""
+            workflow_tracestack = []
+            for node in args:
+                fullname = clsi.cls_fullname(node.plugin_cls)
+                if node.base_cls == Channel:
+                    fullname = f"{fullname}:{node.endpoint_name}"
+                workflow_tracestack.append(fullname)
+            return workflow_tracestack
+
         log_node = self._files[path]
 
-        def workflow(log_line):
-            """Execute a workflow and raise errors related to its execution."""
-            for rule_node in log_node:
-                if rule_node.plugin_obj(log_line) is True:
+        def process_endpoint(endpoint_node, msg, log_line, path, trace_stack):
+            """Process each endpoint and handle any exceptions."""
+            try:
+                endpoint_node.plugin_obj(msg)
+            except Exception as exc_info:
+                EndpointError(
+                    endpoint_node.endpoint_name,
+                    clsi.cls_fullname(endpoint_node.plugin_cls),
+                    exc_info,
+                    log_line,
+                    path,
+                    trace_stack
+                )
+
+        def process_transformer(transformer_node, log_line, path, trace_stack):
+            """Process each transformer and handle any exceptions."""
+            try:
+                msg = transformer_node.plugin_obj(log_line)
+                for endpoint_node in transformer_node:
+                    process_endpoint(endpoint_node, msg, log_line, path, trace_stack)
+            except Exception as exc_info:
+                TransformerError(
+                    clsi.cls_fullname(transformer_node.plugin_cls),
+                    exc_info,
+                    log_line,
+                    path,
+                    trace_stack
+                )
+
+        def process_rule(rule_node, log_line, path, trace_stack):
+            """Process each rule and handle any exceptions."""
+            try:
+                rule_outcome = rule_node.plugin_obj(log_line)
+                if rule_outcome is True:
                     for transformer_node in rule_node:
-                        msg = transformer_node.plugin_obj(log_line)
-                        for endpoint_node in transformer_node:
-                            endpoint_node.plugin_obj(msg)
+                        process_transformer(transformer_node, log_line, path, trace_stack)
+            except Exception as exc_info:
+                RuleError(
+                    clsi.cls_fullname(rule_node.plugin_cls),
+                    exc_info,
+                    log_line,
+                    path,
+                    trace_stack
+                )
+
+        def workflow(log_line):
+            """Execute a workflow and log errors related to its execution."""
+            for rule_node in log_node:
+                trace_stack = workflow_tracestack(log_node, rule_node)
+                process_rule(rule_node, log_line, path, trace_stack)
+        
         return workflow
     
     def get_paths(self):
         return list(self._files.keys())
+
     
     def display_worktrees(self):
         """Traverse nodes and display the worktree with tree-like notation."""

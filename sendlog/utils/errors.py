@@ -185,5 +185,49 @@ class PluginInitError(PluginError):
 class RuntimeError(SendlogError, ABC):
     def __init__(self):
         super().__init__()
-        self.message = "An error occurred during a plugin"
+        self.code = "RUNTIME"
+        self.message = "An error occurred that prevented an alert from sending"
         self._level = logging.error
+
+class RuleError(RuntimeError, ABC):
+    def __init__(self, plugin_class_name, exc_info, log_line, file_path, workflow_tracestack):
+        super().__init__()
+        self.code = "RULE_ERROR"
+        self.message =  f"Rule plugin subclass '{plugin_class_name}' encountered the following error when processing the log line '{log_line}' from file '{file_path}': '{type(exc_info).__name__}: {exc_info}'"
+        self.data = {
+            "plugin_class_name": plugin_class_name,
+            "log_line": log_line,
+            "workflow_trace_stack": workflow_tracestack,
+            "file_path": file_path,
+            "exc_info": exc_info
+        }
+        self.log()
+
+class TransformerError(RuntimeError, ABC):
+    def __init__(self, plugin_class_name, exc_info, log_line, file_path, workflow_tracestack):
+        super().__init__()
+        self.code = "TRANSFORMER_ERROR"
+        self.message =  f"Transformer plugin subclass '{plugin_class_name}' encountered athe following error when processing the log line '{log_line}' from file '{file_path}': '{type(exc_info).__name__}: {exc_info}'"
+        self.data = {
+            "plugin_class_name": plugin_class_name,
+            "log_line": log_line,
+            "workflow_trace_stack": workflow_tracestack,
+            "file_path": file_path,
+            "exc_info": exc_info
+        }
+        self.log()
+
+class EndpointError(RuntimeError, ABC):
+    def __init__(self, endpoint_name, plugin_class_name, exc_info, log_line, file_path, workflow_tracestack):
+        super().__init__()
+        self.code = "ENDPOINT_ERROR"
+        self.message =  f"Endpoint '{endpoint_name}' from Channel plugin subclass '{plugin_class_name}' encountered the following error when processing the alert input '{log_line}' from file '{file_path}': '{type(exc_info).__name__}: {exc_info}'"
+        self.data = {
+            "endpoint_name": endpoint_name,
+            "plugin_class_name": plugin_class_name,
+            "log_line": log_line,
+            "workflow_trace_stack": workflow_tracestack,
+            "file_path": file_path,
+            "exc_info": exc_info
+        }
+        self.log()
