@@ -47,7 +47,7 @@ class WorkflowNode(ABC):
         self._plugin_cls = plugin_cls
         self._subnodes = []
         # Validate plugin class
-        if self.base_cls not in self.plugin_cls.__bases__:
+        if not issubclass(self.plugin_cls, self.base_cls):
             raise PluginInheritanceError(clsi.cls_fullname(self.plugin_cls), self.base_cls.__name__, clsi.cls_bases(self.plugin_cls))
         # Instantiate plugin class
         self._inst_plugin()
@@ -73,7 +73,7 @@ class WorkflowNode(ABC):
 
     def add(self, subnode):
         # Validate subnode inherits from the correct plugin class
-        if PLUGIN_HIERARCHY[self._level + 1] not in subnode.plugin_cls.__bases__:
+        if not issubclass(subnode.plugin_cls, PLUGIN_HIERARCHY[self._level + 1]):
             raise PluginInheritanceError(subnode.plugin_cls.__name__, subnode.base_cls.__name__, clsi.cls_bases(subnode.plugin_cls))
         # Add subnode to node
         self._subnodes.append(subnode)
