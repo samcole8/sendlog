@@ -1,5 +1,7 @@
-log_path: /path/to/my.log
+# Global configuration options
+log_path: /path/to/my.log # Path to sendlog's log. Default is ./sendlog.log. Disable with null.
 
+# Define file workflows
 files:
   /var/auth.log:
     plugin: my_plugin
@@ -11,6 +13,7 @@ files:
             endpoints:
               - my_endpoint
 
+# Define endpoints
 endpoints:
   my_endpoint:
     plugin: my_plugin
