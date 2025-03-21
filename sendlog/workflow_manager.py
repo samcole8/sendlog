@@ -231,6 +231,7 @@ class WorkflowManager():
             """Execute a workflow and log errors related to its execution."""
             for rule_node in log_node:
                 trace_stack = workflow_tracestack(log_node, rule_node)
+                log_line = log_node.plugin_obj(log_line)
                 process_rule(rule_node, log_line, path, trace_stack)
         
         return workflow

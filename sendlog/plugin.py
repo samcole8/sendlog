@@ -53,6 +53,9 @@ class Rule(ABC, metaclass=_RuleMeta):
             return line
 
 class LogType(ABC, metaclass=_LogTypeMeta):
+
+    def __call__(self, line):
+        return line
     
     class Always(Rule):
         def __call__(self, line):
