@@ -68,16 +68,8 @@ class ConfigHandler:
     def log_path(self):
         """Return path to log file."""
         # Get log file path or use a default
-        log_path = self._config.get("path", "sendlog.log")
+        log_path = self._config.get("log_path", "sendlog.log")
         if type(log_path) is not str:
-            raise ConfigTypeError("str", log_path)
+            if log_path:
+                raise ConfigTypeError("str", log_path)
         return log_path
-
-    @property
-    def log(self):
-        """Return boolean to determine if logging is on or off."""
-        # Get boolean from config file or use default
-        log = self._config.get("log", True)
-        if type(log) is not bool:
-            raise ConfigTypeError("bool", log)
-        return log
