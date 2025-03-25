@@ -38,28 +38,18 @@ class _ChannelMeta(ABCMeta):
 
 class Transformer(ABC, metaclass=_TransformerMeta):
 
-    @abstractmethod
-    def __call__(self, line):
-        pass
+    def __call__(self, log_line):
+        return log_line
 
 class Rule(ABC, metaclass=_RuleMeta):
     
-    @abstractmethod
-    def __call__(self, line):
-        pass
-    
-    class Raw(Transformer):
-        def __call__(self, line):
-            return line
+    def __call__(self, log_line):
+        return True
 
 class LogType(ABC, metaclass=_LogTypeMeta):
 
-    def __call__(self, line):
-        return line
-    
-    class Always(Rule):
-        def __call__(self, line):
-            return True
+    def __call__(self, log_line):
+        return log_line
 
 class Channel(ABC, metaclass=_ChannelMeta):
     required_vars = []
