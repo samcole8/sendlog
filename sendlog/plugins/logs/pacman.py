@@ -11,7 +11,8 @@ class Pacman(LogType):
         class HumanReadable(Transformer):
             def __call__(self, parts):
                 context = parts["context"]
-                return f"Command '{context["command"]}' detected at {parts["timestamp"]}."
+                timestamp = datetime.strptime(parts["timestamp"], "%Y-%m-%dT%H:%M:%S%z")
+                return f"Command '{context["command"]}' detected at {timestamp.strftime("%Y-%m-%d %H:%M")}."
         
         class JSONL(Transformer):
             def __call__(self, parts):
