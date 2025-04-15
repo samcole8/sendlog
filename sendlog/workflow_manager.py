@@ -215,9 +215,9 @@ class WorkflowManager():
             """Process each rule and handle any exceptions."""
             try:
                 rule_outcome = rule_node.plugin_obj(log_line)
-                if rule_outcome is True:
+                if rule_outcome is not False:
                     for transformer_node in rule_node:
-                        process_transformer(transformer_node, log_line, path, trace_stack)
+                        process_transformer(transformer_node, rule_outcome, path, trace_stack)
             except Exception as exc_info:
                 RuleError(
                     clsi.cls_fullname(rule_node.plugin_cls),

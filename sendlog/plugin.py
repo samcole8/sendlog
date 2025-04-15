@@ -1,6 +1,7 @@
 from utils.errors import PluginOverrideError, PluginInitError
 from abc import ABC, ABCMeta, abstractmethod
 import sys
+import re
 
 # Metaclasses
 
@@ -38,18 +39,44 @@ class _ChannelMeta(ABCMeta):
 
 class Transformer(ABC, metaclass=_TransformerMeta):
 
-    def __call__(self, log_line):
-        return log_line
+    def __call__(self, log_parts):
+        return log_parts["message"]
 
 class Rule(ABC, metaclass=_RuleMeta):
+
+    regex = None
     
-    def __call__(self, log_line):
-        return True
+    def __call__(self, log_parts):
+        """Convert log message to structured JSON."""
+        if self.__class__.regex:
+            match = re.match(self.__class__.regex, log_parts["message"])
+            if match:
+                message_parts = match.groupdict()
+                return {**log_parts, **message_parts}
+        return False
 
 class LogType(ABC, metaclass=_LogTypeMeta):
+    """
+    Base class for a LogType plugin.
+    """
+
+    regex = None
 
     def __call__(self, log_line):
-        return log_line
+        """
+        Convert log_line to structured JSON using regex.
+        
+        Must return a dictionary with the "message" key.
+        """
+        if self.__class__.regex:
+            match = re.match(self.__class__.regex, log_line)
+            if match:
+                log_parts = match.groupdict()
+                return log_parts
+            else:
+                raise TypeError("Log line did not match the expected format.")
+        else:
+            return {"message": log_line}
 
 class Channel(ABC, metaclass=_ChannelMeta):
     required_vars = []
