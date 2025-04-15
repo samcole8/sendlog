@@ -10,7 +10,8 @@ class TestRule(Rule):
 
 class TestTransformer(Transformer):
     def __call__(self, parts):
-        return f"Command \"{parts['command']}\" detected at {parts['timestamp']}."
+        context = parts["context"]
+        return f"Command '{context['command']}' detected at {parts['timestamp']}."
 
 class PluginTest(unittest.TestCase):
     def test_plugin_pipeline(self):
@@ -24,10 +25,10 @@ class PluginTest(unittest.TestCase):
 
         expected_step2 = {
             **expected_step1,
-            "command": "pacman -Syu"
+            "context": {"command": "pacman -Syu"}
         }
 
-        expected_output = "Command \"pacman -Syu\" detected at 2025-03-28T14:32:59+0000."
+        expected_output = "Command 'pacman -Syu' detected at 2025-03-28T14:32:59+0000."
 
         testlogtype = TestLogType()
         testrule = TestRule()
