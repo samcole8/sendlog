@@ -10,7 +10,8 @@ class Pacman(LogType):
 
         class HumanReadable(Transformer):
             def __call__(self, parts):
-                return f"Command '{parts["command"]}' detected at {parts["timestamp"]}."
+                context = parts["context"]
+                return f"Command '{context["command"]}' detected at {parts["timestamp"]}."
         
         class JSONL(Transformer):
             def __call__(self, parts):

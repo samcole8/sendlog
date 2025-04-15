@@ -52,7 +52,7 @@ class Rule(ABC, metaclass=_RuleMeta):
             match = re.match(self.__class__.regex, log_parts["message"])
             if match:
                 message_parts = match.groupdict()
-                return {**log_parts, **message_parts}
+                return {**log_parts, "context": {**message_parts}}
         return False
 
 class LogType(ABC, metaclass=_LogTypeMeta):
