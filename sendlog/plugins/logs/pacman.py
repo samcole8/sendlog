@@ -1,16 +1,17 @@
 from plugin import LogType, Rule, Transformer
 
+from datetime import datetime
+
 class Pacman(LogType):
+    regex = r"\[(?P<timestamp>.*?)\] \[(?P<application>.*?)\] (?P<message>.*)"
 
     class RunCommand(Rule):
+        regex = r"Running\s+'(?P<command>[^']+)'"
 
-        def __call__(self, line):
-            if "Running" in line:
-                return True
-            else:
-                return False
-
-        class Human(Transformer):
-            def __call__(self, line):
-                return line.split('] ', 2)[-1]
-
+        class HumanReadable(Transformer):
+            def __call__(self, parts):
+                return f"Command '{parts["command"]}' detected at {parts["timestamp"]}."
+        
+        class JSONL(Transformer):
+            def __call__(self, parts):
+                return parts
