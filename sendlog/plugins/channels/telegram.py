@@ -3,7 +3,7 @@ from plugin import Channel
 import requests
 
 class Telegram(Channel):
-    required_vars = ["chat_id", "token"]
+    __slots__ = ["chat_id", "token"]
 
     def __call__(self, msg):
         url = f"https://api.telegram.org/bot{self.token}/sendMessage"

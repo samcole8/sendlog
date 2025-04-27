@@ -19,7 +19,7 @@ class SMTP(Channel):
         - recipient: Recipient's email address.
         - timeout: Timeout duration (in seconds) for establishing the SMTP connection. 
     """
-    required_vars = ["ip", "port", "username", "password", "sender", "recipient", "timeout"]
+    __slots__ = ["ip", "port", "username", "password", "sender", "recipient", "timeout"]
     def __call__(self, payload):
 
         # Extract information from payload
