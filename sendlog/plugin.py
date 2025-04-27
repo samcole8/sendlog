@@ -79,7 +79,7 @@ class LogType(ABC, metaclass=_LogTypeMeta):
             return {"message": log_line}
 
 class Channel(ABC, metaclass=_ChannelMeta):
-    required_vars = []
+    __slots__ = ["name"]
     def __init__(self, name, **kwargs):
         self.name = name
 

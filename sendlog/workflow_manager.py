@@ -161,7 +161,7 @@ class WorkflowManager():
         channel_cls = resolve_class(plugin_mod, channel_name)
         # Validate that endpoint keyword arguments match the specified channel
         given_kws = set(endpoint_kwargs.keys())
-        required_kws = set(channel_cls.required_vars)
+        required_kws = set(channel_cls.__slots__)
         if given_kws != required_kws:
             raise EndpointVariableMismatchError(endpoint_name, channel_name, required_kws, given_kws)
         # Store channel class and arguments for later
