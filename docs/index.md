@@ -2,22 +2,13 @@
 ![Last Commit](https://img.shields.io/github/last-commit/samcole8/sendlog)
 ![Repo Size](https://img.shields.io/github/repo-size/samcole8/sendlog)
 
-sendlog is a lightweight, extensible log monitoring framework with rule-based alerting.
+sendlog is a lightweight, extensible framework for log monitoring and alerting.
 
-*NOTE: Sendlog is in alpha. In its current state, it may be unstable and is subject to significant changes in future releases.*
+*NOTE: sendlog is in alpha. In its current state, it may be unstable and is subject to significant changes in future releases.*
 
 ## Table of Contents
 
 - [Quick Start Guide](quick-start.md)
-- [Plugins](plugins.md)
-  - [Overview](plugins.md#overview)
-  - [Workflows](plugins.md#workflows)
-  - [Endpoints](plugins.md#endpoints)
-- [Configuration File](configuration-file.md)
-  - [Overview](configuration-file.md#overview)
-  - [Destinations](configuration-file.md#destinations)
-  - [Files](configuration-file.md#files)
-- [Logging and Errors](logging.md)
-  - [Overview](logging.md#overview)
-  - [Error codes](logging.md#error-codes)
-  - [Fallback alerts and error reporting](logging.md#fallback-alerts-and-error-reporting)
+- [Overview](overview.md)
+- [Configuration File](config.md)
+- [Plugin DSL](plugin-dsl.md)

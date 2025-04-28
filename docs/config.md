@@ -1,6 +1,4 @@
-## Configuration File
-
-[Back to Contents](..)
+# Configuration File
 
 - [Overview](#overview)
 - [Endpoints](#endpoints)
@@ -12,17 +10,17 @@
   - [Structure](#structure-1)
   - [Example](#example-1)
 
-### Overview
+## Overview
 
 The configuration file defines active alert workflows and endpoints. At the bare minimum, you must define one endpoint and one file workflow for an alert to function.
 
-### Endpoints
+## Endpoints
 
 Once instantiated, a Channel is called an endpoint. It represents the destination itself.
 
 Before configuring a workflow, at least one endpoint is required. They can be defined in the `endpoints` section of the configuration file and re-used for different workflows.
 
-#### Fields
+### Fields
 
 | Field             | Type   | Required | Description                                                              |
 | ----------------- | ------ | -------- | ------------------------------------------------------------------------ |
@@ -31,7 +29,7 @@ Before configuring a workflow, at least one endpoint is required. They can be de
 | `channel`         | string | Yes      | Channel class within the specified plugin (e.g., `Console`, `Telegram`). |
 | `vars`            | map    | No       | Dictionary of custom variables required by the specified Channel.        |
 
-#### Structure
+### Structure
 
 ```yaml
 endpoints:
@@ -42,7 +40,7 @@ endpoints:
       <key>: <value>
 ```
 
-#### Example
+### Example
 
 ```yaml
 endpoints:
@@ -54,11 +52,11 @@ endpoints:
       token: <my_token>
 ```
 
-### Files
+## Files
 
 The `files` section defines the alert workflows for each of the specified files. Defining a workflow requires at least one endpoint to be configured.
 
-#### Fields
+### Fields
 
 | Field                 | Type   | Required | Description                                                   |
 | --------------------- | ------ | -------- | ------------------------------------------------------------- |
@@ -74,7 +72,7 @@ The `files` section defines the alert workflows for each of the specified files.
 
 You can have multiple files, log types, rules, transformer and endpoints under each parent key.
 
-#### Structure
+### Structure
 
 ```yaml
 files:
@@ -89,7 +87,7 @@ files:
               - <endpoint_name>
 ```
 
-#### Example
+### Example
 
 ```yaml
 files:

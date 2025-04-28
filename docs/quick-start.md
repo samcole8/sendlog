@@ -1,6 +1,12 @@
-## Quick Start Guide
+# Quick Start Guide
 
-### Installation
+- [Installation](#installation)
+- [Configuring alerts](#configuring-alerts)
+- [Writing Plugins](#writing-plugins)
+- [Starting the service](#starting-the-service)
+
+
+## Installation
 
 This quick start installation guide is designed for Linux distributions running systemd.
 
@@ -23,26 +29,30 @@ This quick start installation guide is designed for Linux distributions running 
    sudo cp /opt/sendlog/pkg/sendlog.service /etc/systemd/system/sendlog.service
    ```
 
-### Configuring alerts
+## Configuring alerts
 
-Configuration examples are available in `examples/`. For more information on configuring sendlog, see [configuration file](https://sendlog.samcole.net/configuration-file) documentation.
+Configuration examples are available in `examples/`. For more information on configuring sendlog, see the [Configuration File](config.md) documentation.
 
-### Starting the service
+## Writing Plugins
 
-Start/enable the service:
+You can write plugins to integrate sendlog with custom log structures or endpoints. For more information on writing plugins, see the [Plugin DSL](plugin-dsl.md) documentation.
 
-```sh
-sudo systemctl enable --now sendlog
-```
+## Starting the service
 
-Check if the system is operational:
+1. Start/enable the service:
 
-```sh
-sudo systemctl status sendlog
-```
+   ```sh
+   sudo systemctl enable --now sendlog
+   ```
 
-If the configuration file changes, restart the service:
+2. Check if the system is operational:
 
-```sh
-sudo systemctl restart sendlog
-```
+   ```sh
+   sudo systemctl status sendlog
+   ```
+
+3. If the configuration file changes, restart the service:
+
+   ```sh
+   sudo systemctl restart sendlog
+   ```
