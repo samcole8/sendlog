@@ -1,13 +1,20 @@
-from utils.errors import PluginOverrideError, PluginInitError
+from utils.errors import PluginOverrideError, PluginInitError, PluginCallError
 from abc import ABC, ABCMeta, abstractmethod
 import sys
 import re
+import inspect
 
 # Metaclasses
 
 class _NodeMeta(ABCMeta):
     """Enforce elements for all plugins"""
     def __new__(cls, name, bases, dct):
+        # Enforce two parameters in __call__ methods
+        if "__call__" in dct:
+            call_method = dct["__call__"]
+            call_params = list(inspect.signature(call_method).parameters)
+            if call_params[0] != "self" or len(call_params) != 2:
+                raise PluginCallError(name, call_params)
         # Prevent parameters other than self in __init__ methods
         if "__init__" in dct:
             init_method = dct["__init__"]

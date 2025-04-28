@@ -180,6 +180,17 @@ class PluginInitError(PluginError):
         }
         self.log()
 
+class PluginCallError(PluginError):
+    def __init__(self, plugin_class_name, params):
+        super().__init__()
+        self.code = "CALL_VALIDATION"
+        self.message =  f"Plugin subclass '{plugin_class_name}' was rejected because the '__call__' method contained invalid parameters; got '{params}' instead of '['self', *]'"
+        self.data = {
+            "plugin_class_name": plugin_class_name,
+            "params": params
+        }
+        self.log()
+
 # Workflow-fatal runtime errors
 
 class RuntimeError(SendlogError, ABC):
