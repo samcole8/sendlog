@@ -35,24 +35,28 @@ This quick start installation guide is designed for Linux distributions running 
 
 ### Configuring alerts
 
-Configuration examples are available in `examples/`. For more information on configuring sendlog, see [configuration file](https://sendlog.samcole.net/configuration-file) documentation.
+Configuration examples are available in `examples/`. For more information on configuring sendlog, see the [Configuration File](https://sendlog.samcole.net/config) documentation.
 
-### Starting the service
+## Writing Plugins
 
-Start/enable the service:
+You can write plugins to integrate sendlog with custom log structures or endpoints. For more information on writing plugins, see the [Plugin DSL](https://sendlog.samcole.net/plugin-dsl) documentation.
 
-```sh
-sudo systemctl enable --now sendlog
-```
+## Starting the service
 
-Check if the system is operational:
+1. Start/enable the service:
 
-```sh
-sudo systemctl status sendlog
-```
+   ```sh
+   sudo systemctl enable --now sendlog
+   ```
 
-If the configuration file changes, restart the service:
+2. Check if the system is operational:
 
-```sh
-sudo systemctl restart sendlog
-```
+   ```sh
+   sudo systemctl status sendlog
+   ```
+
+3. If the configuration file changes, restart the service:
+
+   ```sh
+   sudo systemctl restart sendlog
+   ```
