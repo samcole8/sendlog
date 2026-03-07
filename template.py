@@ -5,7 +5,7 @@ from sendlog.plugins.sinks.telegram import Telegram
 telegram = Telegram()
 
 class Monitor1(Monitor):
-    source = Source("file.txt")
+    source = "file.txt"
     flows = [
         Auth.Login.ToTelegram | telegram
     ]
