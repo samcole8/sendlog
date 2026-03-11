@@ -3,8 +3,8 @@ from sendlog.sinks.telegram import Telegram
 from sendlog.sources.file import FileSource
 
 sendlog = Sendlog()
-telegram = Telegram("token")
-pacman_log = FileSource("/var/log/pacman.log")
+telegram = Telegram(token="token", chat_id="chat_id")
+pacman_log = FileSource(path="/var/log/pacman.log")
 
 @sendlog.watch(source=pacman_log, sinks=[telegram])
 def on_pacman_command(msg):
