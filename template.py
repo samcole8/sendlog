@@ -1,13 +1,16 @@
-from sendlog.core import Monitor, Source, run
-from sendlog.plugins.formats.auth import Auth
-from sendlog.plugins.sinks.telegram import Telegram
+from sendlog import Sendlog, Msg
+from sendlog.sinks.telegram import Telegram
+from sendlog.sources.file import FileSource
 
-telegram = Telegram()
+sendlog = Sendlog()
+telegram = Telegram("token")
+pacman_log = FileSource("/var/log/pacman.log")
 
-class Monitor1(Monitor):
-    source = "file.txt"
-    flows = [
-        Auth.Login.ToTelegram | telegram
-    ]
+@sendlog.watch(source=pacman_log, sinks=[telegram])
+def on_pacman_command(msg):
+    if not msg.match(r"^\[pacman\]"):
+        return
+    if match := msg.match(r"Running '(?P<command>[^']+)'"):
+        return f"Command detected: {match.group('command')}"
 
-run(Monitor1)
+sendlog.run()
