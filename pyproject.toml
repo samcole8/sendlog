@@ -1,0 +1,5 @@
+[project]
+name = "logpipe"
+version = "0.3.0"
+description = "Simple log monitoring tool designed for flexibility and fast deployment.."
+readme = "README.md"
